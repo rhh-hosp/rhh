@@ -5,6 +5,10 @@ body {
   background-position: center;
   background-attachment: fixed;
   font-family: 'Georgia', serif; /* Default font for English */
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 /* Header Section */
@@ -21,12 +25,14 @@ body {
   font-size: 2rem;
   font-weight: bold;
   padding: 20px;
+  width: 100%;
 }
 
 /* Search Section */
 .search-container {
   margin: 20px 0;
   text-align: center;
+  width: 100%;
 }
 
 .search-container label {
@@ -52,7 +58,7 @@ input[type="text"] {
   font-family: 'Georgia', serif; /* English font */
 }
 
-/* Table Styles */
+/* Table Wrapper */
 .table-container {
   width: 100%;
   overflow-x: auto; /* Enables horizontal scrolling on small screens */
@@ -64,7 +70,7 @@ table {
   border-collapse: collapse;
   margin-top: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  min-width: 600px; /* Ensures table remains readable on smaller screens */
+  min-width: 100%; /* Ensures table remains full width */
 }
 
 th, td {
@@ -108,6 +114,7 @@ tr:hover {
 /* Section styles for each floor */
 section {
   margin-bottom: 30px;
+  width: 100%;
 }
 
 h2 {
@@ -119,6 +126,7 @@ h2 {
   font-size: 1.5rem;
   text-transform: uppercase;
   font-weight: bold;
+  width: 100%;
 }
 
 /* Divider between sections */
@@ -126,4 +134,5 @@ hr {
   border: 1px solid #ddd;
   margin-top: 20px;
   margin-bottom: 20px;
+  width: 100%;
 }
