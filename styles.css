@@ -67,7 +67,7 @@ input[type="text"] {
 }
 
 table {
-  width: 100%;
+  width: 100%; /* Ensures table spans full width */
   border-collapse: collapse;
   margin-top: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -97,9 +97,9 @@ td {
 }
 
 /* Column Widths */
-th:nth-child(1), td:nth-child(1) { width: 25%; } /* Floor */
-th:nth-child(2), td:nth-child(2) { width: 37.5%; } /* Department/Service */
-th:nth-child(3), td:nth-child(3) { width: 37.5%; } /* Specialty */
+th:nth-child(1), td:nth-child(1) { width: 33.33%; } /* Floor */
+th:nth-child(2), td:nth-child(2) { width: 33.33%; } /* Department/Service */
+th:nth-child(3), td:nth-child(3) { width: 33.33%; } /* Specialty */
 
 /* Alternating row colors */
 tr:nth-child(even) {
@@ -144,12 +144,13 @@ hr {
 @media (max-width: 768px) {
   th, td {
     font-size: 14px; /* Reduce font size on smaller screens */
+    padding: 10px; /* Adjust padding for smaller screens */
   }
-  
+
   th:nth-child(1), td:nth-child(1),
   th:nth-child(2), td:nth-child(2),
   th:nth-child(3), td:nth-child(3) {
-    width: auto; /* Allow columns to stack on smaller screens */
+    width: 33.33% !important; /* Force each column to take up equal space */
   }
 
   /* Ensure full width for small screens */
@@ -161,10 +162,10 @@ hr {
   /* Allow table to shrink on small screens */
   table {
     width: 100%;
-    table-layout: auto;
+    table-layout: fixed; /* Makes columns resize to fit within table */
   }
 
   .table-container {
-    overflow-x: auto; /* Allow scrolling if the table exceeds the screen width */
+    overflow-x: hidden; /* Disable horizontal scroll for small screens */
   }
 }
