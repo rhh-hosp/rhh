@@ -24,13 +24,17 @@
 
   <script>
     var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
-    
+
     Papa.parse(csvUrl, {
       download: true,
       header: true,
       dynamicTyping: true,
       complete: function(results) {
+        console.log("Fetched Data:", results.data); // Debugging log
         showData(results.data);
+      },
+      error: function(error) {
+        console.error("Error loading CSV:", error); // Error logging
       }
     });
 
@@ -50,7 +54,7 @@
       // Iterate through each floor and create a section
       for (var floor in floors) {
         var section = document.createElement('section');
-        
+
         // Create a floor header
         var floorHeader = document.createElement('h2');
         floorHeader.innerText = floor;
@@ -72,7 +76,7 @@
                 <tr>
                   <td>${row['Floor']}</td>
                   <td>${row['Department/Service']}</td>
-                  <td>${row['Specialty'] || 'N/A'}</td> <!-- Ensure Specialty Column Exists -->
+                  <td>${row['Specialty'] ? row['Specialty'] : ''}</td> <!-- Avoid showing N/A -->
                 </tr>
               `;
             }).join('')}
@@ -80,7 +84,7 @@
         `;
 
         section.appendChild(table);
-        
+
         // Add a horizontal divider after each floor section
         var divider = document.createElement('hr');
         section.appendChild(divider);
@@ -100,7 +104,7 @@
         rows.forEach(function(row) {
           var floor = row.cells[0].textContent.toLowerCase();
           var department = row.cells[1].textContent.toLowerCase();
-          var specialty = row.cells[2].textContent.toLowerCase(); // Added Specialty Column
+          var specialty = row.cells[2].textContent.toLowerCase(); // Search Specialty too
 
           if (floor.includes(input) || department.includes(input) || specialty.includes(input)) {
             row.style.display = '';
