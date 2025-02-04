@@ -33,7 +33,7 @@ body {
 .search-container {
   margin: 20px 0;
   text-align: center;
-  width: 100vw; /* Ensures full viewport width */
+  width: 100%; /* Full width */
 }
 
 .search-container label {
@@ -98,18 +98,8 @@ td {
 
 /* Column Widths */
 th:nth-child(1), td:nth-child(1) { width: 33.33%; } /* Floor */
-th:nth-child(2), td:nth-child(2) { width: 33.33%; } /* Dept-Name (Dept + Dr.Name) */
+th:nth-child(2), td:nth-child(2) { width: 33.33%; } /* Department/Service */
 th:nth-child(3), td:nth-child(3) { width: 33.33%; } /* Specialty */
-
-/* Adjust the header text size for the "Dept-Name" column */
-th:nth-child(2) {
-  font-size: 14px; /* Smaller font size */
-  white-space: nowrap; /* Prevent text from wrapping */
-  overflow: hidden; /* Hide overflow */
-  text-overflow: unset; /* No ellipsis */
-  text-align: center; /* Center the text */
-  line-height: 1.5; /* Adjust line height for better spacing between "Dept" and "Dr.Name" */
-}
 
 /* Alternating row colors */
 tr:nth-child(even) {
