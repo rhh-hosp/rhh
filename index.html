@@ -66,7 +66,7 @@
           <thead>
             <tr>
               <th>Floor</th>
-              <th>Department/Service</th>
+              <th>Dept-Name</th>
               <th>Specialty</th> <!-- New Column -->
             </tr>
           </thead>
@@ -75,7 +75,7 @@
               return `
                 <tr>
                   <td>${row['Floor']}</td>
-                  <td>${row['Department/Service']}</td>
+                  <td>${row['Dept-Name']}</td>
                   <td>${row['Specialty'] ? row['Specialty'] : ''}</td> <!-- Avoid showing N/A -->
                 </tr>
               `;
