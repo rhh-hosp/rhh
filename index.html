@@ -15,9 +15,9 @@
 
   <!-- Search Section -->
   <div class="search-container">
-    <label for="search">Search for a Doctor or Department Name:</label> <!-- English label -->
-    <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم:</label> <!-- Arabic label -->
-    <input type="text" id="search" placeholder="Search for a department, service, or floor..." onkeyup="searchTable()">
+    <label for="search">Search for a Doctor, Department, or Specialty:</label>
+    <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
+    <input type="text" id="search" placeholder="Search for a department, service, or specialty..." onkeyup="searchTable()">
   </div>
 
   <div id="doctorTable"></div> <!-- Dynamic content will be loaded here -->
@@ -63,6 +63,7 @@
             <tr>
               <th>Floor</th>
               <th>Department/Service</th>
+              <th>Specialty</th> <!-- New Column -->
             </tr>
           </thead>
           <tbody>
@@ -71,6 +72,7 @@
                 <tr>
                   <td>${row['Floor']}</td>
                   <td>${row['Department/Service']}</td>
+                  <td>${row['Specialty'] || 'N/A'}</td> <!-- Ensure Specialty Column Exists -->
                 </tr>
               `;
             }).join('')}
@@ -98,8 +100,9 @@
         rows.forEach(function(row) {
           var floor = row.cells[0].textContent.toLowerCase();
           var department = row.cells[1].textContent.toLowerCase();
+          var specialty = row.cells[2].textContent.toLowerCase(); // Added Specialty Column
 
-          if (floor.includes(input) || department.includes(input)) {
+          if (floor.includes(input) || department.includes(input) || specialty.includes(input)) {
             row.style.display = '';
             isAnyRowVisible = true;
           } else {
