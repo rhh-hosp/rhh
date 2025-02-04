@@ -58,6 +58,8 @@ table {
   border-collapse: collapse;
   margin-top: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  display: block; /* Allows scrolling on small screens */
 }
 
 th, td {
@@ -82,6 +84,11 @@ td {
   background-color: #f9f9f9;
   color: #691636; /* Set text color for cells */
 }
+
+/* Column Widths */
+th:nth-child(1), td:nth-child(1) { width: 20%; } /* Floor */
+th:nth-child(2), td:nth-child(2) { width: 40%; } /* Department/Service */
+th:nth-child(3), td:nth-child(3) { width: 40%; } /* Specialty */
 
 /* Alternating row colors */
 tr:nth-child(even) {
