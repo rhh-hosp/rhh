@@ -168,4 +168,9 @@ hr {
   .table-container {
     overflow-x: hidden; /* Disable horizontal scroll for small screens */
   }
+  /* Adjust the header text size for the "Department/Service" column */
+th:nth-child(2) {
+  font-size: 14px; /* Smaller font size */
+  word-wrap: break-word; /* Allow text to wrap if necessary */
+}
 }
