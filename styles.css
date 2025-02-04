@@ -24,7 +24,7 @@ body {
   font-size: 2rem;
   font-weight: bold;
   padding: 0 20px; /* Prevents overflow */
-  width: 100%; /* Full width of the viewport */
+  width: 100vw; /* Ensures full viewport width */
   box-sizing: border-box; /* Ensures padding does not cause overflow */
   background-attachment: scroll; /* Prevents fixed background attachment issues */
 }
@@ -115,7 +115,7 @@ tr:hover {
 /* Section styles for each floor */
 section {
   margin-bottom: 30px;
-  width: 100%; /* Ensures full width */
+  width: 100vw; /* Ensures section spans full width */
 }
 
 h2 {
@@ -127,7 +127,7 @@ h2 {
   font-size: 1.5rem;
   text-transform: uppercase;
   font-weight: bold;
-  width: 100%; /* Ensures full width */
+  width: 100vw; /* Ensures full width */
 }
 
 /* Divider between sections */
@@ -151,5 +151,10 @@ hr {
   th:nth-child(2), td:nth-child(2),
   th:nth-child(3), td:nth-child(3) {
     width: auto; /* Allow columns to stack on smaller screens */
+  }
+
+  /* Ensure full width for small screens */
+  .header, section, h2 {
+    width: 100vw;
   }
 }
