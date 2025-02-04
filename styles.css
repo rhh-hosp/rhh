@@ -24,8 +24,9 @@ body {
   text-align: center;
   font-size: 2rem;
   font-weight: bold;
-  padding: 20px;
-  width: 100vw; /* Ensures full viewport width */
+  padding: 0 20px; /* Prevents overflow */
+  width: 100%; /* Full width of the viewport */
+  box-sizing: border-box; /* Ensures padding does not cause overflow */
 }
 
 /* Search Section */
@@ -60,17 +61,17 @@ input[type="text"] {
 
 /* Table Wrapper */
 .table-container {
-  width: 100vw;
+  width: 100%;
   overflow-x: auto; /* Enables horizontal scrolling on small screens */
   display: block;
 }
 
 table {
-  width: 100vw;
+  max-width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  min-width: 100vw; /* Ensures table remains full width */
+  min-width: 100%;
 }
 
 th, td {
@@ -134,5 +135,20 @@ hr {
   border: 1px solid #ddd;
   margin-top: 20px;
   margin-bottom: 20px;
-  width: 100vw; /* Ensures full width */
+  width: 90%; /* Slightly less than full width for margin spacing */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Media Query for responsiveness */
+@media (max-width: 768px) {
+  th, td {
+    font-size: 14px; /* Reduce font size on smaller screens */
+  }
+  
+  th:nth-child(1), td:nth-child(1),
+  th:nth-child(2), td:nth-child(2),
+  th:nth-child(3), td:nth-child(3) {
+    width: auto; /* Allow columns to stack on smaller screens */
+  }
 }
