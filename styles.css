@@ -24,7 +24,7 @@ body {
   font-size: 2rem;
   font-weight: bold;
   padding: 0 20px; /* Prevents overflow */
-  width: 100vw; /* Ensures full viewport width */
+  width: 100%; /* Ensures full width of the viewport */
   box-sizing: border-box; /* Ensures padding does not cause overflow */
   background-attachment: scroll; /* Prevents fixed background attachment issues */
 }
@@ -67,11 +67,10 @@ input[type="text"] {
 }
 
 table {
-  max-width: 100%;
+  width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  min-width: 100%;
 }
 
 th, td {
@@ -115,7 +114,9 @@ tr:hover {
 /* Section styles for each floor */
 section {
   margin-bottom: 30px;
-  width: 100vw; /* Ensures section spans full width */
+  width: 100%; /* Ensures section spans full width */
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 h2 {
@@ -127,7 +128,7 @@ h2 {
   font-size: 1.5rem;
   text-transform: uppercase;
   font-weight: bold;
-  width: 100vw; /* Ensures full width */
+  width: 100%; /* Ensures full width */
 }
 
 /* Divider between sections */
@@ -135,9 +136,7 @@ hr {
   border: 1px solid #ddd;
   margin-top: 20px;
   margin-bottom: 20px;
-  width: 90%; /* Slightly less than full width for margin spacing */
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%; /* Ensures full width */
   background-color: #ddd; /* Set a background color for the hr */
 }
 
@@ -155,6 +154,17 @@ hr {
 
   /* Ensure full width for small screens */
   .header, section, h2 {
-    width: 100vw;
+    width: 100%;
+    box-sizing: border-box; /* Ensure padding doesn't break layout */
+  }
+
+  /* Allow table to shrink on small screens */
+  table {
+    width: 100%;
+    table-layout: auto;
+  }
+
+  .table-container {
+    overflow-x: auto; /* Allow scrolling if the table exceeds the screen width */
   }
 }
