@@ -98,10 +98,10 @@ td {
 
 /* Column Widths */
 th:nth-child(1), td:nth-child(1) { width: 33.33%; } /* Floor */
-th:nth-child(2), td:nth-child(2) { width: 33.33%; } /* Department/Service */
+th:nth-child(2), td:nth-child(2) { width: 33.33%; } /* Dept-Name */
 th:nth-child(3), td:nth-child(3) { width: 33.33%; } /* Specialty */
 
-/* Adjust the header text size for the "Department/Service" column */
+/* Adjust the header text size for the "Dept-Name" column */
 th:nth-child(2) {
   font-size: 14px; /* Smaller font size */
   word-wrap: break-word; /* Allow text to wrap if necessary */
