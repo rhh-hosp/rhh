@@ -53,13 +53,18 @@ input[type="text"] {
 }
 
 /* Table Styles */
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Enables horizontal scrolling on small screens */
+  display: block;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  overflow-x: auto;
-  display: block; /* Allows scrolling on small screens */
+  min-width: 600px; /* Ensures table remains readable on smaller screens */
 }
 
 th, td {
