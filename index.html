@@ -3,125 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Find your Doctor</title>
+  <title>Responsive Table</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 </head>
 <body>
-  <!-- Header Section with Background Image -->
-  <header class="header">
-    <h1></h1>
-  </header>
 
-  <!-- Search Section -->
-  <div class="search-container">
-    <label for="search">Search for a Doctor, Department, or Specialty:</label>
-    <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
-    <input type="text" id="search" placeholder="Search for a department, service, or specialty..." onkeyup="searchTable()">
+  <div class="header">
+    <h1>Hospital Directory</h1>
   </div>
 
-  <div id="doctorTable"></div> <!-- Dynamic content will be loaded here -->
+  <section>
+    <div class="search-container">
+      <label for="search">Search for Services:</label>
+      <input type="text" id="search" placeholder="Search services">
+    </div>
+  </section>
 
-  <script>
-    var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
+  <section class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Floor</th>
+          <th>Dept<br>Name</th> <!-- Changed from "Department/Service" to "Dept" and "Name" in two lines -->
+          <th>Specialty</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Cardiology<br>Dr. John Doe</td>
+          <td>Heart Surgery</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Neurology<br>Dr. Jane Smith</td>
+          <td>Brain Surgery</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Orthopedics<br>Dr. Mike Wilson</td>
+          <td>Bone Surgery</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    Papa.parse(csvUrl, {
-      download: true,
-      header: true,
-      dynamicTyping: true,
-      complete: function(results) {
-        console.log("Fetched Data:", results.data); // Debugging log
-        showData(results.data);
-      },
-      error: function(error) {
-        console.error("Error loading CSV:", error); // Error logging
-      }
-    });
+  <hr>
 
-    function showData(data) {
-      var tableContainer = document.getElementById('doctorTable');
-      tableContainer.innerHTML = ''; // Clear any existing content
+  <footer>
+    <p>&copy; 2025 Your Organization</p>
+  </footer>
 
-      // Group data by floor
-      var floors = {};
-      data.forEach(function(row) {
-        if (!floors[row['Floor']]) {
-          floors[row['Floor']] = [];
-        }
-        floors[row['Floor']].push(row);
-      });
-
-      // Iterate through each floor and create a section
-      for (var floor in floors) {
-        var section = document.createElement('section');
-
-        // Create a floor header
-        var floorHeader = document.createElement('h2');
-        floorHeader.innerText = floor;
-        section.appendChild(floorHeader);
-
-        // Create the table for this floor
-        var table = document.createElement('table');
-        table.innerHTML = `
-          <thead>
-            <tr>
-              <th>Floor</th>
-              <th>Dept-Name</th>
-              <th>Specialty</th> <!-- New Column -->
-            </tr>
-          </thead>
-          <tbody>
-            ${floors[floor].map(function(row) {
-              return `
-                <tr>
-                  <td>${row['Floor']}</td>
-                  <td>${row['Dept-Name']}</td>
-                  <td>${row['Specialty'] ? row['Specialty'] : ''}</td> <!-- Avoid showing N/A -->
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        `;
-
-        section.appendChild(table);
-
-        // Add a horizontal divider after each floor section
-        var divider = document.createElement('hr');
-        section.appendChild(divider);
-
-        tableContainer.appendChild(section);
-      }
-    }
-
-    function searchTable() {
-      var input = document.getElementById('search').value.toLowerCase();
-      var sections = document.querySelectorAll('#doctorTable section');
-
-      sections.forEach(function(section) {
-        var rows = section.querySelectorAll('table tbody tr');
-        var isAnyRowVisible = false;
-
-        rows.forEach(function(row) {
-          var floor = row.cells[0].textContent.toLowerCase();
-          var department = row.cells[1].textContent.toLowerCase();
-          var specialty = row.cells[2].textContent.toLowerCase(); // Search Specialty too
-
-          if (floor.includes(input) || department.includes(input) || specialty.includes(input)) {
-            row.style.display = '';
-            isAnyRowVisible = true;
-          } else {
-            row.style.display = 'none';
-          }
-        });
-
-        // Show or hide the floor section based on whether any row is visible
-        if (isAnyRowVisible) {
-          section.style.display = '';
-        } else {
-          section.style.display = 'none';
-        }
-      });
-    }
-  </script>
 </body>
 </html>
