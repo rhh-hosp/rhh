@@ -25,14 +25,14 @@ body {
   font-size: 2rem;
   font-weight: bold;
   padding: 20px;
-  width: 100%;
+  width: 100vw; /* Ensures full viewport width */
 }
 
 /* Search Section */
 .search-container {
   margin: 20px 0;
   text-align: center;
-  width: 100%;
+  width: 100vw; /* Ensures full viewport width */
 }
 
 .search-container label {
@@ -60,17 +60,17 @@ input[type="text"] {
 
 /* Table Wrapper */
 .table-container {
-  width: 100%;
+  width: 100vw;
   overflow-x: auto; /* Enables horizontal scrolling on small screens */
   display: block;
 }
 
 table {
-  width: 100%;
+  width: 100vw;
   border-collapse: collapse;
   margin-top: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  min-width: 100%; /* Ensures table remains full width */
+  min-width: 100vw; /* Ensures table remains full width */
 }
 
 th, td {
@@ -97,9 +97,9 @@ td {
 }
 
 /* Column Widths */
-th:nth-child(1), td:nth-child(1) { width: 20%; } /* Floor */
-th:nth-child(2), td:nth-child(2) { width: 40%; } /* Department/Service */
-th:nth-child(3), td:nth-child(3) { width: 40%; } /* Specialty */
+th:nth-child(1), td:nth-child(1) { width: 25%; } /* Floor */
+th:nth-child(2), td:nth-child(2) { width: 37.5%; } /* Department/Service */
+th:nth-child(3), td:nth-child(3) { width: 37.5%; } /* Specialty */
 
 /* Alternating row colors */
 tr:nth-child(even) {
@@ -114,7 +114,7 @@ tr:hover {
 /* Section styles for each floor */
 section {
   margin-bottom: 30px;
-  width: 100%;
+  width: 100vw;
 }
 
 h2 {
@@ -126,7 +126,7 @@ h2 {
   font-size: 1.5rem;
   text-transform: uppercase;
   font-weight: bold;
-  width: 100%;
+  width: 100vw; /* Ensures full width */
 }
 
 /* Divider between sections */
@@ -134,5 +134,5 @@ hr {
   border: 1px solid #ddd;
   margin-top: 20px;
   margin-bottom: 20px;
-  width: 100%;
+  width: 100vw; /* Ensures full width */
 }
