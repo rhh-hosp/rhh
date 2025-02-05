@@ -3,19 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title></title>
+  <title>Search Table with Pop-out Results</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 </head>
 <body>
   <header class="header">
-    <h1></h1>
+    <h1>Find Your Doctor</h1>
   </header>
 
   <div class="search-container">
     <label for="search">Search for a Doctor, Department, or Specialty:</label>
-    <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
     <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
+  </div>
+
+  <!-- Modal for Pop-out -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Search Result</h2>
+      <div id="modalResult"></div>
+    </div>
   </div>
 
   <div class="table-container">
@@ -39,8 +47,8 @@
       header: true,
       dynamicTyping: true,
       complete: function(results) {
-        console.log("CSV Headers:", results.meta.fields); // Debugging
-        console.log("Sample Data:", results.data[0]); // Debugging
+        console.log("CSV Headers:", results.meta.fields);
+        console.log("Sample Data:", results.data[0]);
         showData(results.data);
       },
       error: function(error) {
@@ -73,19 +81,33 @@
       var input = document.getElementById("search").value.toLowerCase();
       var rows = document.querySelectorAll("#doctorTable tbody tr");
       var found = false;
+      var modalContent = '';
 
       rows.forEach(function(row) {
         var text = row.innerText.toLowerCase();
         if (text.includes(input)) {
           row.style.display = "";
           if (!found) {
-            row.scrollIntoView({ behavior: "smooth", block: "center" }); // Scroll to the first match
-            found = true; // Only scroll to the first match
+            modalContent = row.innerHTML;  // Capture the first match for the pop-out modal
+            openModal(modalContent);
+            found = true;
           }
         } else {
           row.style.display = "none";
         }
       });
+    }
+
+    function openModal(content) {
+      var modal = document.getElementById("resultModal");
+      var modalResult = document.getElementById("modalResult");
+      modalResult.innerHTML = content; // Show the search result inside the modal
+      modal.style.display = "block";
+    }
+
+    function closeModal() {
+      var modal = document.getElementById("resultModal");
+      modal.style.display = "none"; // Hide the modal
     }
   </script>
 </body>
