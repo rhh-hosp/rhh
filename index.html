@@ -1,176 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search and Filter Data</title>
-    <link href="https://fonts.googleapis.com/css2?family=Almarai&family=Georgia&display=swap" rel="stylesheet">
-    <!-- Link to your external CSS file -->
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Search</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 </head>
-
 <body>
+  <header class="header">
+    <h1></h1>
+  </header>
 
-    <div class="header">
-        <span>Doctor Information</span>
-    </div>
+  <div class="search-container">
+    <label for="search">Search for a Doctor, Department, or Specialty:</label>
+    <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
+    <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
+  </div>
 
-    <div class="search-container">
-        <label for="search">Search:</label>
-        <input type="text" id="search" placeholder="Search by Department or Specialty" onkeyup="searchTable()">
+  <div class="table-container">
+    <table id="doctorTable">
+      <thead>
+        <tr>
+          <th>Floor</th>
+          <th>Dept-Name</th>
+          <th>Specialty</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-        <label for="departmentDropdown">Select Dept-Name:</label>
-        <select id="departmentDropdown" onchange="updateSpecialtyDropdown()">
-            <option value="">All Departments</option>
-        </select>
+  <script>
+    var allData = [];
+    var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
 
-        <label for="specialtyDropdown">Select Specialty:</label>
-        <select id="specialtyDropdown">
-            <option value="">All Specialties</option>
-        </select>
-    </div>
+    Papa.parse(csvUrl, {
+      download: true,
+      header: true,
+      dynamicTyping: true,
+      complete: function(results) {
+        allData = results.data;
+        showData(allData);
+      },
+      error: function(error) {
+        console.error("Error loading CSV:", error);
+      }
+    });
 
-    <div class="table-container">
-        <table id="doctorTable">
-            <thead>
-                <tr>
-                    <th>Floor</th>
-                    <th>Dept-Name</th>
-                    <th>Specialty</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Table rows will be inserted here dynamically -->
-            </tbody>
-        </table>
-    </div>
+    function showData(data) {
+      var tbody = document.querySelector("#doctorTable tbody");
+      tbody.innerHTML = "";
+      var groupedData = {};
+      data.forEach(function(row) {
+        var floor = row["Floor"] || "Unknown";
+        if (!groupedData[floor]) {
+          groupedData[floor] = [];
+        }
+        groupedData[floor].push(row);
+      });
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-    <script>
-        var allData = [];
-        var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
+      for (var floor in groupedData) {
+        var sectionHeader = document.createElement("tr");
+        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
+        tbody.appendChild(sectionHeader);
 
-        Papa.parse(csvUrl, {
-            download: true,
-            header: true,
-            dynamicTyping: true,
-            complete: function (results) {
-                allData = results.data;
-                showData(allData);
-                populateDepartmentDropdown(allData); // Populate the department dropdown
-            },
-            error: function (error) {
-                console.error("Error loading CSV:", error);
-            }
+        groupedData[floor].forEach(function(row) {
+          var tr = document.createElement("tr");
+          var deptName = row["DeptName"] || "";
+          var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
+
+          var deptNameForDisplay = deptName.replace(/"([^"]+)"/g, '').trim();
+          var specialtyForDisplay = specialty.replace(/"([^"]+)"/g, '').trim();
+
+          tr.innerHTML = `
+            <td>${floor}</td>
+            <td>${deptNameForDisplay}</td>
+            <td>${specialtyForDisplay}</td>
+          `;
+          tr.dataset.deptName = deptName.toLowerCase();
+          tr.dataset.specialty = specialty.toLowerCase();
+
+          tbody.appendChild(tr);
         });
+      }
+    }
 
-        function showData(data) {
-            var tbody = document.querySelector("#doctorTable tbody");
-            tbody.innerHTML = "";
-            var groupedData = {};
-            data.forEach(function (row) {
-                var floor = row["Floor"] || "Unknown";
-                var deptName = row["Dept-Name"] || ""; // Changed to "Dept-Name"
-                var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
-
-                // Group by floor
-                if (!groupedData[floor]) {
-                    groupedData[floor] = [];
-                }
-                groupedData[floor].push(row);
-            });
-
-            for (var floor in groupedData) {
-                var sectionHeader = document.createElement("tr");
-                sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
-                tbody.appendChild(sectionHeader);
-
-                groupedData[floor].forEach(function (row) {
-                    var tr = document.createElement("tr");
-                    var deptName = row["Dept-Name"] || ""; // Changed to "Dept-Name"
-                    var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
-
-                    // Skip the department column in the table display
-                    tr.innerHTML = `
-                        <td>${floor}</td>
-                        <td>${deptName}</td>
-                        <td>${specialty}</td>
-                    `;
-
-                    // Store the department data in the row's dataset for filtering
-                    tr.dataset.deptName = deptName.toLowerCase();
-                    tr.dataset.specialty = specialty.toLowerCase();
-
-                    tbody.appendChild(tr);
-                });
-            }
-        }
-
-        function searchTable() {
-            var input = document.getElementById("search").value.toLowerCase();
-            var department = document.getElementById("departmentDropdown").value.toLowerCase();
-            var specialty = document.getElementById("specialtyDropdown").value.toLowerCase();
-
-            var tbody = document.querySelector("#doctorTable tbody");
-            tbody.innerHTML = '';
-            if (input.trim() === "" && department === "" && specialty === "") {
-                showData(allData);
-                return;
-            }
-
-            var filteredData = allData.filter(row => {
-                var deptName = row["Dept-Name"] ? row["Dept-Name"].toLowerCase() : ""; // Changed to "Dept-Name"
-                var deptSpecialty = row["Specialty"] ? row["Specialty"].toLowerCase() : "";
-                var match = (deptName + " " + deptSpecialty).includes(input);
-
-                // Filter by department and specialty if selected
-                if (department && deptName !== department) return false;
-                if (specialty && !deptSpecialty.includes(specialty)) return false;
-
-                return match;
-            });
-
-            showData(filteredData);
-            if (filteredData.length > 0) {
-                document.querySelector("#doctorTable").scrollIntoView({ behavior: "smooth" });
-            }
-        }
-
-        function populateDepartmentDropdown(data) {
-            var departmentDropdown = document.getElementById("departmentDropdown");
-            var departments = [...new Set(data.map(row => row["Dept-Name"] || ""))]; // Changed to "Dept-Name"
-
-            departments.forEach(function (dept) {
-                var option = document.createElement("option");
-                option.value = dept;
-                option.innerHTML = dept;
-                departmentDropdown.appendChild(option);
-            });
-        }
-
-        function updateSpecialtyDropdown() {
-            var department = document.getElementById("departmentDropdown").value;
-            var specialtyDropdown = document.getElementById("specialtyDropdown");
-            specialtyDropdown.innerHTML = '<option value="">All Specialties</option>'; // Clear current options
-
-            var specialties = [];
-            if (department) {
-                specialties = allData.filter(row => row["Dept-Name"] === department) // Changed to "Dept-Name"
-                    .map(row => row["Specialty"]);
-            } else {
-                specialties = [...new Set(allData.map(row => row["Specialty"] || ""))];
-            }
-
-            specialties.forEach(function (specialty) {
-                var option = document.createElement("option");
-                option.value = specialty;
-                option.innerHTML = specialty;
-                specialtyDropdown.appendChild(option);
-            });
-        }
-    </script>
-
+    function searchTable() {
+      var input = document.getElementById("search").value.toLowerCase();
+      var tbody = document.querySelector("#doctorTable tbody");
+      tbody.innerHTML = '';
+      if (input.trim() === "") {
+        showData(allData);
+        return;
+      }
+      var filteredData = allData.filter(row => {
+        var deptName = row["DeptName"] ? row["DeptName"].toLowerCase() : "";
+        var specialty = row["Specialty"] ? row["Specialty"].toLowerCase() : "";
+        return (deptName + " " + specialty).includes(input);
+      });
+      showData(filteredData);
+      if (filteredData.length > 0) {
+        document.querySelector("#doctorTable").scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  </script>
 </body>
-
 </html>
