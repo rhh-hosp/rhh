@@ -72,10 +72,19 @@
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
       var rows = document.querySelectorAll("#doctorTable tbody tr");
+      var found = false;
 
       rows.forEach(function(row) {
         var text = row.innerText.toLowerCase();
-        row.style.display = text.includes(input) ? "" : "none";
+        if (text.includes(input)) {
+          row.style.display = "";
+          if (!found) {
+            row.scrollIntoView({ behavior: "smooth", block: "center" }); // Scroll to the first match
+            found = true; // Only scroll to the first match
+          }
+        } else {
+          row.style.display = "none";
+        }
       });
     }
   </script>
