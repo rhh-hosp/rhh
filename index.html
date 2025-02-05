@@ -6,139 +6,16 @@
   <title>Doctor Search</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-  <style>
-    /* General body styling */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      margin: 0;
-      padding: 20px;
-    }
-
-    /* Header styling */
-    .header h1 {
-      color: #333;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    /* Search container styling */
-    .search-container {
-      margin-bottom: 20px;
-      text-align: center;
-    }
-
-    .search-container input {
-      padding: 10px;
-      font-size: 16px;
-      width: 80%;
-      max-width: 400px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    /* Filter container styling */
-    .filter-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .filter-container select {
-      font-size: 16px;
-      padding: 12px;
-      width: 80%;
-      max-width: 400px;
-      margin: 8px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      background-color: #fff;
-      transition: all 0.3s ease;
-    }
-
-    .filter-container select:hover {
-      border-color: #777;
-    }
-
-    .filter-container label {
-      font-size: 18px;
-      margin-bottom: 8px;
-      font-weight: bold;
-      color: #691636;
-    }
-
-    /* Table styling */
-    .table-container {
-      overflow-x: auto;
-      margin-top: 30px;
-      text-align: center;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 16px;
-    }
-
-    th {
-      background-color: #74613C;
-      color: white;
-      padding: 10px;
-    }
-
-    td {
-      padding: 8px;
-      border: 1px solid #ddd;
-    }
-
-    tr:hover {
-      background-color: #f1f1f1;
-    }
-
-    tr td:first-child {
-      font-weight: bold;
-    }
-
-    /* Styling for section headers in the table */
-    .section-header {
-      background-color: #74613C;
-      color: white;
-      font-weight: bold;
-      text-align: center;
-      padding: 10px;
-    }
-
-    /* Styling for mobile responsiveness */
-    @media (max-width: 768px) {
-      .search-container input, .filter-container select {
-        width: 100%;
-        max-width: 100%;
-      }
-    }
-  </style>
 </head>
 <body>
   <header class="header">
-    <h1>Doctor Search</h1>
+    <h1></h1>
   </header>
 
   <div class="search-container">
     <label for="search">Search for a Doctor, Department, or Specialty:</label>
     <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
     <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
-  </div>
-
-  <div class="filter-container">
-    <label for="deptFilter">Department - القسم</label>
-    <select id="deptFilter" onchange="updateDoctorFilter()">
-      <option value="">Select Department</option>
-    </select>
-
-    <label for="doctorFilter">Doctor Name - اسم الطبيب</label>
-    <select id="doctorFilter" onchange="applyFilters()">
-      <option value="">Select Doctor</option>
-    </select>
   </div>
 
   <div class="table-container">
@@ -164,7 +41,6 @@
       dynamicTyping: true,
       complete: function(results) {
         allData = results.data;
-        populateDeptFilter(allData);
         showData(allData);
       },
       error: function(error) {
@@ -172,43 +48,6 @@
       }
     });
 
-    // Populate the Department filter dropdown
-    function populateDeptFilter(data) {
-      var departments = new Set();
-      data.forEach(function(row) {
-        var department = row["Department"] || "";
-        if (department) {
-          departments.add(department.trim());
-        }
-      });
-      fillDropdown("deptFilter", departments);
-    }
-
-    // Fill the dropdown with the department values
-    function fillDropdown(id, values) {
-      var select = document.getElementById(id);
-      select.innerHTML = '<option value="">Select Department</option>';
-      values.forEach(function(value) {
-        var option = document.createElement("option");
-        option.textContent = value;
-        option.value = value;
-        select.appendChild(option);
-      });
-    }
-
-    // Filter the doctors based on the selected department
-    function updateDoctorFilter() {
-      var deptValue = document.getElementById("deptFilter").value;
-      var doctors = new Set();
-      allData.forEach(function(row) {
-        if (row["Department"] && row["Department"].toLowerCase() === deptValue.toLowerCase()) {
-          doctors.add(row["DeptName"]);
-        }
-      });
-      fillDropdown("doctorFilter", doctors);
-    }
-
-    // Display the data in the table
     function showData(data) {
       var tbody = document.querySelector("#doctorTable tbody");
       tbody.innerHTML = "";
@@ -223,8 +62,7 @@
 
       for (var floor in groupedData) {
         var sectionHeader = document.createElement("tr");
-        sectionHeader.classList.add("section-header");
-        sectionHeader.innerHTML = `<td colspan="3">${floor}</td>`;
+        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
         tbody.appendChild(sectionHeader);
 
         groupedData[floor].forEach(function(row) {
@@ -237,29 +75,17 @@
 
           tr.innerHTML = `
             <td>${floor}</td>
-            <td>${deptNameForDisplay}</td>
-            <td>${specialtyForDisplay}</td>
+            <td style="color: #691636;">${deptNameForDisplay}</td>
+            <td style="color: #691636;">${specialtyForDisplay}</td>
           `;
-          tr.dataset.deptName = row["Department"] ? row["Department"].toLowerCase() : "";
-          tr.dataset.doctor = deptNameForDisplay.toLowerCase();
+          tr.dataset.deptName = deptName.toLowerCase();
+          tr.dataset.specialty = specialty.toLowerCase();
+
           tbody.appendChild(tr);
         });
       }
     }
 
-    // Apply filters based on department and doctor
-    function applyFilters() {
-      var deptValue = document.getElementById("deptFilter").value;
-      var doctorValue = document.getElementById("doctorFilter").value;
-      var filteredData = allData.filter(function(row) {
-        var deptMatch = !deptValue || (row["Department"] && row["Department"].toLowerCase() === deptValue.toLowerCase());
-        var doctorMatch = !doctorValue || (row["DeptName"] && row["DeptName"].toLowerCase() === doctorValue.toLowerCase());
-        return deptMatch && doctorMatch;
-      });
-      showData(filteredData);
-    }
-
-    // Search functionality including Department column
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
       var tbody = document.querySelector("#doctorTable tbody");
@@ -268,11 +94,10 @@
         showData(allData);
         return;
       }
-      var filteredData = allData.filter(function(row) {
+      var filteredData = allData.filter(row => {
         var deptName = row["DeptName"] ? row["DeptName"].toLowerCase() : "";
         var specialty = row["Specialty"] ? row["Specialty"].toLowerCase() : "";
-        var department = row["Department"] ? row["Department"].toLowerCase() : "";
-        return (deptName + " " + specialty + " " + department).includes(input);
+        return (deptName + " " + specialty).includes(input);
       });
       showData(filteredData);
       if (filteredData.length > 0) {
