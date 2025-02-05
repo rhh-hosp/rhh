@@ -55,9 +55,9 @@
       data.forEach(function(row) {
         var tr = document.createElement("tr");
 
-        var floor = row["Floor"] || "N/A";
-        var deptName = row["DeptName"] || "N/A";
-        var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "N/A";
+        var floor = row["Floor"] || "";
+        var deptName = row["DeptName"] || "";
+        var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
 
         tr.innerHTML = `
           <td>${floor}</td>
