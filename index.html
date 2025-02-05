@@ -65,50 +65,35 @@
       // For each floor group, add a section header and the rows
       for (var floor in groupedData) {
         var floorGroup = groupedData[floor];
-        var hasMatchingRows = false; // Flag to check if any row in this floor matches the search
+        var sectionHeader = document.createElement("tr");
+        sectionHeader.innerHTML = `
+          <td colspan="3" style="font-weight: bold; background-color: #f2f2f2; text-align: center;">${floor}</td>
+        `;
+        tbody.appendChild(sectionHeader);
 
-        // Check if any row in this floor group matches the search term
+        // Add the rows for this floor
         floorGroup.forEach(function(row) {
-          if (matchesSearchTerm(row)) {
-            hasMatchingRows = true;
-          }
-        });
+          var tr = document.createElement("tr");
 
-        // Only add the floor section if it has matching rows
-        if (hasMatchingRows) {
-          // Add the section header
-          var sectionHeader = document.createElement("tr");
-          sectionHeader.innerHTML = `
-            <td colspan="3" style="font-weight: bold; background-color: #ddd; text-align: center;">${floor}</td>
+          var deptName = row["DeptName"] || "";
+          var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
+
+          // Remove any quoted text from the display
+          var deptNameForDisplay = deptName.replace(/"([^"]+)"/g, '').trim();
+          var specialtyForDisplay = specialty.replace(/"([^"]+)"/g, '').trim();
+
+          tr.innerHTML = `
+            <td>${floor}</td>
+            <td>${deptNameForDisplay}</td>
+            <td>${specialtyForDisplay}</td>
           `;
-          tbody.appendChild(sectionHeader);
 
-          // Add the rows for this floor
-          floorGroup.forEach(function(row) {
-            if (matchesSearchTerm(row)) {
-              var tr = document.createElement("tr");
+          // Set a custom data attribute for the unmodified content to preserve the quoted words for search
+          tr.dataset.deptName = deptName.toLowerCase();
+          tr.dataset.specialty = specialty.toLowerCase();
 
-              var deptName = row["DeptName"] || "";
-              var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
-
-              // Remove any quoted text from the display
-              var deptNameForDisplay = deptName.replace(/"([^"]+)"/g, '').trim();
-              var specialtyForDisplay = specialty.replace(/"([^"]+)"/g, '').trim();
-
-              tr.innerHTML = `
-                <td>${floor}</td>
-                <td>${deptNameForDisplay}</td>
-                <td>${specialtyForDisplay}</td>
-              `;
-
-              // Set a custom data attribute for the unmodified content to preserve the quoted words for search
-              tr.dataset.deptName = deptName.toLowerCase();
-              tr.dataset.specialty = specialty.toLowerCase();
-
-              tbody.appendChild(tr);
-            }
-          });
-        }
+          tbody.appendChild(tr);
+        });
       }
     }
 
@@ -126,26 +111,8 @@
       var input = document.getElementById("search").value.toLowerCase();
       var rows = document.querySelectorAll("#doctorTable tbody tr");
 
-      rows.forEach(function(row) {
-        var deptNameText = row.dataset.deptName || "";
-        var specialtyText = row.dataset.specialty || "";
-
-        var textToSearch = deptNameText + " " + specialtyText;
-
-        // If the search term matches any of the department or specialty values, show the row
-        row.style.display = textToSearch.includes(input) ? "" : "none";
-      });
-
-      // Group rows by their visibility after search
-      groupRowsByFloor();
-    }
-
-    function groupRowsByFloor() {
-      var tbody = document.querySelector("#doctorTable tbody");
-      var rows = Array.from(tbody.querySelectorAll("tr"));
       var groupedRows = {};
 
-      // Group the rows by floor
       rows.forEach(function(row) {
         if (row.querySelector('td')) { // Ignore headers
           var floor = row.querySelector('td').innerText.trim();
@@ -157,23 +124,28 @@
       });
 
       // Clear the table body and re-add rows with section headers
+      var tbody = document.querySelector("#doctorTable tbody");
       tbody.innerHTML = '';
 
       for (var floor in groupedRows) {
+        // Filter rows for this floor based on the search term
+        var visibleRows = groupedRows[floor].filter(function(row) {
+          var deptNameText = row.dataset.deptName || "";
+          var specialtyText = row.dataset.specialty || "";
+          return (deptNameText + " " + specialtyText).includes(input);
+        });
+
         // Only add the floor if there are visible rows for it
-        if (groupedRows[floor].some(row => row.style.display !== "none")) {
-          // Add the section header
+        if (visibleRows.length > 0) {
           var sectionHeader = document.createElement("tr");
           sectionHeader.innerHTML = `
-            <td colspan="3" style="font-weight: bold; background-color: #ddd; text-align: center;">${floor}</td>
+            <td colspan="3" style="font-weight: bold; background-color: #f2f2f2; text-align: center;">${floor}</td>
           `;
           tbody.appendChild(sectionHeader);
 
           // Add the rows for this floor
-          groupedRows[floor].forEach(function(row) {
-            if (row.style.display !== "none") {
-              tbody.appendChild(row);
-            }
+          visibleRows.forEach(function(row) {
+            tbody.appendChild(row);
           });
         }
       }
