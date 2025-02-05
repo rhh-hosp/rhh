@@ -1,13 +1,13 @@
-/* Global Background */
+/* Global Styles */
 body {
   background-image: url('https://github.com/ykhafaja/my-html-site/blob/main/Background.jpg?raw=true');
   background-size: cover;
   background-position: center;
-  font-family: 'Georgia', serif; /* Default font for English */
+  font-family: 'Georgia', serif;
   margin: 0;
   padding: 0;
   width: 100%;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-x: hidden;
 }
 
 /* Header Section */
@@ -23,17 +23,16 @@ body {
   text-align: center;
   font-size: 2rem;
   font-weight: bold;
-  padding: 0 20px; /* Prevents overflow */
-  width: 100%; /* Ensures full width of the viewport */
-  box-sizing: border-box; /* Ensures padding does not cause overflow */
-  background-attachment: scroll; /* Prevents fixed background attachment issues */
+  padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Search Section */
 .search-container {
   margin: 20px 0;
   text-align: center;
-  width: 100%; /* Full width */
+  width: 100%;
 }
 
 .search-container label {
@@ -41,11 +40,11 @@ body {
   font-weight: bold;
   display: block;
   margin-bottom: 10px;
-  color: #691636; /* Label color updated to #691636 */
+  color: #691636;
 }
 
 .search-container .arabic-label {
-  font-family: 'Almarai', sans-serif; /* Arabic font */
+  font-family: 'Almarai', sans-serif;
 }
 
 input[type="text"] {
@@ -53,21 +52,14 @@ input[type="text"] {
   padding: 12px;
   margin-bottom: 20px;
   font-size: 16px;
-  border: 1px solid #691636; /* Border color set to official color */
+  border: 1px solid #691636;
   border-radius: 4px;
   box-sizing: border-box;
-  font-family: 'Georgia', serif; /* English font */
 }
 
-/* Table Wrapper */
-.table-container {
-  width: 100%;
-  overflow-x: auto; /* Enables horizontal scrolling on small screens */
-  display: block;
-}
-
+/* Table Styles */
 table {
-  width: 100%; /* Ensures table spans full width */
+  width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -76,12 +68,12 @@ table {
 th, td {
   padding: 14px;
   border: 1px solid #ddd;
-  text-align: center; /* Center text horizontally */
-  vertical-align: middle; /* Center text vertically */
-  font-size: 16px; /* Increased font size */
-  color: #691636; /* Set text color to #691636 */
-  white-space: pre-wrap; /* Allow multi-line text (for Alt + Enter) */
-  word-wrap: break-word; /* Ensure long words are wrapped */
+  text-align: center;
+  vertical-align: middle;
+  font-size: 16px;
+  color: #691636;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 th {
@@ -93,28 +85,19 @@ th {
 
 td {
   background-color: #f9f9f9;
-  color: #691636; /* Set text color for cells */
 }
 
-/* Column Widths */
-th:nth-child(1), td:nth-child(1) { width: 33.33%; } /* Floor */
-th:nth-child(2), td:nth-child(2) { width: 33.33%; } /* Department/Service */
-th:nth-child(3), td:nth-child(3) { width: 33.33%; } /* Specialty */
-
-/* Alternating row colors */
 tr:nth-child(even) {
   background-color: #f4f4f4;
 }
 
-/* Hover effect on table rows */
 tr:hover {
   background-color: #ddd;
 }
 
-/* Section styles for each floor */
+/* Floor Sections */
 section {
   margin-bottom: 30px;
-  width: 100%; /* Ensures section spans full width */
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -123,49 +106,28 @@ h2 {
   background-color: #74613c;
   color: white;
   padding: 10px;
-  margin: 0;
   text-align: center;
   font-size: 1.5rem;
   text-transform: uppercase;
   font-weight: bold;
-  width: 100%; /* Ensures full width */
 }
 
-/* Divider between sections */
+/* Divider */
 hr {
   border: 1px solid #ddd;
   margin-top: 20px;
   margin-bottom: 20px;
-  width: 100%; /* Ensures full width */
-  background-color: #ddd; /* Set a background color for the hr */
+  width: 100%;
 }
 
-/* Media Query for responsiveness */
+/* Responsive Design */
 @media (max-width: 768px) {
   th, td {
-    font-size: 14px; /* Reduce font size on smaller screens */
-    padding: 10px; /* Adjust padding for smaller screens */
+    font-size: 14px;
+    padding: 10px;
   }
 
-  th:nth-child(1), td:nth-child(1),
-  th:nth-child(2), td:nth-child(2),
-  th:nth-child(3), td:nth-child(3) {
-    width: 33.33% !important; /* Force each column to take up equal space */
-  }
-
-  /* Ensure full width for small screens */
-  .header, section, h2 {
-    width: 100%;
-    box-sizing: border-box; /* Ensure padding doesn't break layout */
-  }
-
-  /* Allow table to shrink on small screens */
   table {
-    width: 100%;
-    table-layout: fixed; /* Makes columns resize to fit within table */
-  }
-
-  .table-container {
-    overflow-x: hidden; /* Disable horizontal scroll for small screens */
+    table-layout: fixed;
   }
 }
