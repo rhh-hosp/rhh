@@ -59,16 +59,20 @@
         var deptName = row["DeptName"] || "";
         var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
 
-        // Remove the text inside quotes for display (but keep the rest)
-        deptName = deptName.replace(/"([^"]+)"/g, '').trim(); // Remove quoted text (works for both Arabic and English)
-        specialty = specialty.replace(/"([^"]+)"/g, '').trim(); // Remove quoted text (works for both Arabic and English)
+        // Remove any quoted text from the display (but still keep it for search purposes)
+        var deptNameForDisplay = deptName.replace(/"([^"]+)"/g, '').trim();
+        var specialtyForDisplay = specialty.replace(/"([^"]+)"/g, '').trim();
 
-        // Replace the quoted part with an empty string, but we need to keep that part for searching
+        // Make sure to add the original row to the search by keeping the quoted content.
         tr.innerHTML = `
           <td>${floor}</td>
-          <td>${deptName}</td>
-          <td>${specialty}</td>
+          <td>${deptNameForDisplay}</td>
+          <td>${specialtyForDisplay}</td>
         `;
+
+        // Set a custom data attribute for the unmodified content to preserve the quoted words for search
+        tr.dataset.deptName = deptName.toLowerCase();
+        tr.dataset.specialty = specialty.toLowerCase();
 
         tbody.appendChild(tr);
       });
@@ -79,13 +83,14 @@
       var rows = document.querySelectorAll("#doctorTable tbody tr");
 
       rows.forEach(function(row) {
-        var text = row.innerText.toLowerCase();
+        var deptNameText = row.dataset.deptName || "";
+        var specialtyText = row.dataset.specialty || "";
 
-        // Get all text (including quoted parts) for matching
-        var searchText = row.innerHTML.toLowerCase();
-        
-        // If the search term is found within the unquoted parts of the text
-        row.style.display = searchText.includes(input) ? "" : "none";
+        // Combine the text of both columns for searching
+        var textToSearch = deptNameText + " " + specialtyText;
+
+        // If the search term matches any of the department or specialty values, show the row
+        row.style.display = textToSearch.includes(input) ? "" : "none";
       });
     }
   </script>
