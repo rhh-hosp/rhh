@@ -31,6 +31,24 @@
     </table>
   </div>
 
+  <!-- Popup Modal -->
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <span class="close" onclick="closePopup()">&times;</span>
+      <h2 id="popup-header"></h2>
+      <table id="popup-table">
+        <thead>
+          <tr>
+            <th>Floor</th>
+            <th>Dept-Name</th>
+            <th>Specialty</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
   <script>
     var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
 
@@ -61,8 +79,8 @@
 
         tr.innerHTML = `
           <td>${floor}</td>
-          <td>${deptName}</td>
-          <td>${specialty}</td>
+          <td onclick="openPopup('${row['DeptName']}', ${JSON.stringify(data)})">${deptName}</td>
+          <td onclick="openPopup('${row['Specialty']}', ${JSON.stringify(data)})">${specialty}</td>
         `;
 
         tbody.appendChild(tr);
@@ -77,6 +95,44 @@
         var text = row.innerText.toLowerCase();
         row.style.display = text.includes(input) ? "" : "none";
       });
+    }
+
+    function openPopup(searchTerm, data) {
+      // Filter data based on the search term
+      var filteredData = data.filter(function(row) {
+        return row.DeptName.toLowerCase().includes(searchTerm.toLowerCase()) || row.Specialty.toLowerCase().includes(searchTerm.toLowerCase());
+      });
+
+      // Update popup header
+      var header = document.getElementById('popup-header');
+      header.textContent = searchTerm;
+
+      // Populate the popup table with filtered data
+      var tbody = document.querySelector("#popup-table tbody");
+      tbody.innerHTML = ""; // Clear previous data
+
+      filteredData.forEach(function(row) {
+        var tr = document.createElement("tr");
+
+        var floor = row["Floor"] || "";
+        var deptName = row["DeptName"] || "";
+        var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
+
+        tr.innerHTML = `
+          <td>${floor}</td>
+          <td>${deptName}</td>
+          <td>${specialty}</td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      // Show the popup
+      document.getElementById('popup').style.display = 'block';
+    }
+
+    function closePopup() {
+      document.getElementById('popup').style.display = 'none';
     }
   </script>
 </body>
