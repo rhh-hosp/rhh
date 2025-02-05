@@ -9,7 +9,7 @@
 </head>
 <body>
   <header class="header">
-    <h1>Doctor, Department, or Specialty Search</h1>
+    <h1></h1>
   </header>
 
   <!-- Search Section with Background Same as Website -->
@@ -97,10 +97,14 @@
       groupedResultsDiv.innerHTML = ""; // Clear previous results
 
       for (var floor in groupedResults) {
+        if (floor === "Ground Floor") {
+          floor = "Ground Floor"; // Fix for Ground Floor
+        }
+
         var sectionDiv = document.createElement("div");
         sectionDiv.classList.add("popup-section");
         var sectionTitle = document.createElement("h3");
-        sectionTitle.innerText = `Floor ${floor}`;
+        sectionTitle.innerText = `Floor: ${floor}`;
         sectionDiv.appendChild(sectionTitle);
 
         var table = document.createElement("table");
