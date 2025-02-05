@@ -47,13 +47,10 @@
 
   <div class="filter-container">
     <select id="floorFilter" onchange="applyFilters()">
-      <option value="">Select Floor</option>
+      <option value="">Floor - الطابق</option>
     </select>
     <select id="deptFilter" onchange="applyFilters()">
-      <option value="">Select Department</option>
-    </select>
-    <select id="specialtyFilter" onchange="applyFilters()">
-      <option value="">Select Specialty</option>
+      <option value="">Dr. Name - اسم الطبيب</option>
     </select>
   </div>
 
@@ -91,20 +88,18 @@
     }
 
     function populateFilters(data) {
-      var floors = new Set(), depts = new Set(), specialties = new Set();
+      var floors = new Set(), depts = new Set();
       data.forEach(row => {
         floors.add(row["Floor"]);
         depts.add(row["DeptName"].replace(/"([^\"]+)"/g, '').trim());
-        specialties.add(row["Specialty"].replace(/"([^\"]+)"/g, '').trim());
       });
       fillDropdown("floorFilter", floors);
       fillDropdown("deptFilter", depts);
-      fillDropdown("specialtyFilter", specialties);
     }
 
     function fillDropdown(id, values) {
       var select = document.getElementById(id);
-      select.innerHTML = '<option value="">Select</option>';
+      select.innerHTML = select.id === "floorFilter" ? '<option value="">Floor - الطابق</option>' : '<option value="">Dr. Name - اسم الطبيب</option>';
       values.forEach(value => {
         var option = document.createElement("option");
         option.textContent = value;
@@ -116,34 +111,38 @@
     function showData(data) {
       var tbody = document.querySelector("#doctorTable tbody");
       tbody.innerHTML = "";
+      var groupedData = {};
       data.forEach(row => {
-        var tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row["Floor"]}</td>
-          <td>${row["DeptName"].replace(/"([^\"]+)"/g, '').trim()}</td>
-          <td>${row["Specialty"].replace(/"([^\"]+)"/g, '').trim()}</td>
-        `;
-        tbody.appendChild(tr);
+        var floor = row["Floor"] || "Unknown";
+        if (!groupedData[floor]) {
+          groupedData[floor] = [];
+        }
+        groupedData[floor].push(row);
       });
+
+      for (var floor in groupedData) {
+        var sectionHeader = document.createElement("tr");
+        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
+        tbody.appendChild(sectionHeader);
+
+        groupedData[floor].forEach(function(row) {
+          var tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${floor}</td>
+            <td>${row["DeptName"].replace(/"([^\"]+)"/g, '').trim()}</td>
+            <td>${row["Specialty"].replace(/"([^\"]+)"/g, '').trim()}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
     }
 
     function applyFilters() {
       var floorValue = document.getElementById("floorFilter").value;
       var deptValue = document.getElementById("deptFilter").value;
-      var specialtyValue = document.getElementById("specialtyFilter").value;
       var filteredData = allData.filter(row => 
         (!floorValue || row["Floor"] === floorValue) &&
-        (!deptValue || row["DeptName"].replace(/"([^\"]+)"/g, '').trim() === deptValue) &&
-        (!specialtyValue || row["Specialty"].replace(/"([^\"]+)"/g, '').trim() === specialtyValue)
-      );
-      showData(filteredData);
-    }
-
-    function searchTable() {
-      var input = document.getElementById("search").value.toLowerCase();
-      var filteredData = allData.filter(row => 
-        row["DeptName"].toLowerCase().includes(input) || 
-        row["Specialty"].toLowerCase().includes(input)
+        (!deptValue || row["DeptName"].replace(/"([^\"]+)"/g, '').trim() === deptValue)
       );
       showData(filteredData);
     }
