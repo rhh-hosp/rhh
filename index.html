@@ -6,15 +6,66 @@
   <title>Doctor Search</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  <style>
+    .dropdown {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    label {
+      color: #691636;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .table-container {
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #74613C;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+    tr:hover {
+      background-color: #ddd;
+    }
+  </style>
 </head>
 <body>
   <header class="header">
-    <h1></h1>
+    <h1>Doctor Search</h1>
   </header>
 
   <div class="search-container">
+    <label for="department">Department - القسم:</label>
+    <select id="department" class="dropdown" onchange="updateDoctors()">
+      <option value="">Select Department</option>
+    </select>
+
+    <label for="doctor">Doctor Name - اسم الطبيب:</label>
+    <select id="doctor" class="dropdown">
+      <option value="">Select Doctor</option>
+    </select>
+  </div>
+
+  <div class="search-container">
     <label for="search">Search for a Doctor, Department, or Specialty:</label>
-    <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
     <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
   </div>
 
@@ -41,12 +92,44 @@
       dynamicTyping: true,
       complete: function(results) {
         allData = results.data;
+        populateDropdowns(allData);
         showData(allData);
       },
       error: function(error) {
         console.error("Error loading CSV:", error);
       }
     });
+
+    function populateDropdowns(data) {
+      // Get unique departments
+      var departments = [...new Set(data.map(item => item["DeptName"] || "Unknown"))];
+      var departmentDropdown = document.getElementById("department");
+      
+      departments.forEach(department => {
+        var option = document.createElement("option");
+        option.value = department;
+        option.textContent = department;
+        departmentDropdown.appendChild(option);
+      });
+    }
+
+    function updateDoctors() {
+      var department = document.getElementById("department").value;
+      var doctorDropdown = document.getElementById("doctor");
+      doctorDropdown.innerHTML = '<option value="">Select Doctor</option>';
+
+      if (department) {
+        var filteredDoctors = allData.filter(item => item["DeptName"] === department);
+        var doctorNames = [...new Set(filteredDoctors.map(item => item["DoctorName"] || "Unknown"))];
+
+        doctorNames.forEach(doctor => {
+          var option = document.createElement("option");
+          option.value = doctor;
+          option.textContent = doctor;
+          doctorDropdown.appendChild(option);
+        });
+      }
+    }
 
     function showData(data) {
       var tbody = document.querySelector("#doctorTable tbody");
