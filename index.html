@@ -60,8 +60,8 @@
         var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
 
         // Remove the text inside quotes for display (but keep the rest)
-        deptName = deptName.replace(/"([^"]+)"/g, '').trim(); // Remove quoted text
-        specialty = specialty.replace(/"([^"]+)"/g, '').trim(); // Remove quoted text
+        deptName = deptName.replace(/"([^"]+)"/g, '').trim(); // Remove quoted text (works for both Arabic and English)
+        specialty = specialty.replace(/"([^"]+)"/g, '').trim(); // Remove quoted text (works for both Arabic and English)
 
         // Replace the quoted part with an empty string, but we need to keep that part for searching
         tr.innerHTML = `
