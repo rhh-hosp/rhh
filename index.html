@@ -7,7 +7,7 @@
     <title>Search and Filter Data</title>
     <link href="https://fonts.googleapis.com/css2?family=Almarai&family=Georgia&display=swap" rel="stylesheet">
     <!-- Link to your external CSS file -->
-    <link rel="stylesheet" href="path/to/your/styles.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -20,7 +20,7 @@
         <label for="search">Search:</label>
         <input type="text" id="search" placeholder="Search by Department or Specialty" onkeyup="searchTable()">
 
-        <label for="departmentDropdown">Select Department:</label>
+        <label for="departmentDropdown">Select Dept-Name:</label>
         <select id="departmentDropdown" onchange="updateSpecialtyDropdown()">
             <option value="">All Departments</option>
         </select>
@@ -36,7 +36,7 @@
             <thead>
                 <tr>
                     <th>Floor</th>
-                    <th>Department</th>
+                    <th>Dept-Name</th>
                     <th>Specialty</th>
                 </tr>
             </thead>
@@ -71,7 +71,7 @@
             var groupedData = {};
             data.forEach(function (row) {
                 var floor = row["Floor"] || "Unknown";
-                var deptName = row["Department"] || ""; // Changed to "Department"
+                var deptName = row["Dept-Name"] || ""; // Changed to "Dept-Name"
                 var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
 
                 // Group by floor
@@ -88,7 +88,7 @@
 
                 groupedData[floor].forEach(function (row) {
                     var tr = document.createElement("tr");
-                    var deptName = row["Department"] || ""; // Changed to "Department"
+                    var deptName = row["Dept-Name"] || ""; // Changed to "Dept-Name"
                     var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
 
                     // Skip the department column in the table display
@@ -120,7 +120,7 @@
             }
 
             var filteredData = allData.filter(row => {
-                var deptName = row["Department"] ? row["Department"].toLowerCase() : ""; // Changed to "Department"
+                var deptName = row["Dept-Name"] ? row["Dept-Name"].toLowerCase() : ""; // Changed to "Dept-Name"
                 var deptSpecialty = row["Specialty"] ? row["Specialty"].toLowerCase() : "";
                 var match = (deptName + " " + deptSpecialty).includes(input);
 
@@ -139,7 +139,7 @@
 
         function populateDepartmentDropdown(data) {
             var departmentDropdown = document.getElementById("departmentDropdown");
-            var departments = [...new Set(data.map(row => row["Department"] || ""))]; // Changed to "Department"
+            var departments = [...new Set(data.map(row => row["Dept-Name"] || ""))]; // Changed to "Dept-Name"
 
             departments.forEach(function (dept) {
                 var option = document.createElement("option");
@@ -156,7 +156,7 @@
 
             var specialties = [];
             if (department) {
-                specialties = allData.filter(row => row["Department"] === department) // Changed to "Department"
+                specialties = allData.filter(row => row["Dept-Name"] === department) // Changed to "Dept-Name"
                     .map(row => row["Specialty"]);
             } else {
                 specialties = [...new Set(allData.map(row => row["Specialty"] || ""))];
