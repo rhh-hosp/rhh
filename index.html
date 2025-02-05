@@ -23,11 +23,6 @@
     <select id="departmentDropdown" onchange="updateDoctorNames()">
       <option value="">Select Department</option>
     </select>
-
-    <label for="doctorDropdown">Select Doctor Name:</label>
-    <select id="doctorDropdown" disabled>
-      <option value="">Select Doctor</option>
-    </select>
   </div>
 
   <div class="table-container">
@@ -92,7 +87,7 @@
 
       for (var floor in groupedData) {
         var sectionHeader = document.createElement("tr");
-        sectionHeader.innerHTML = `<td colspan="4" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`; // Update colspan to 4
+        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`; // Updated to 3 columns
         tbody.appendChild(sectionHeader);
 
         groupedData[floor].forEach(function(row) {
@@ -140,24 +135,18 @@
 
     function updateDoctorNames() {
       var selectedDepartment = document.getElementById("departmentDropdown").value;
-      var doctorDropdown = document.getElementById("doctorDropdown");
-      doctorDropdown.innerHTML = "<option value=''>Select Doctor</option>"; // Reset doctor dropdown
-      doctorDropdown.disabled = !selectedDepartment; // Enable only if department is selected
+      var tbody = document.querySelector("#doctorTable tbody");
+      tbody.innerHTML = ''; // Clear the table
+      if (!selectedDepartment) {
+        showData(allData); // Show all data if no department selected
+        return;
+      }
 
-      if (!selectedDepartment) return;
-
-      var doctors = allData.filter(function(row) {
+      var filteredData = allData.filter(function(row) {
         return row["Department"] && row["Department"].toLowerCase() === selectedDepartment.toLowerCase();
-      }).map(function(row) {
-        return row["DeptName"]; // Assuming doctor's name is under DeptName
       });
 
-      doctors.forEach(function(doctor) {
-        var option = document.createElement("option");
-        option.value = doctor;
-        option.textContent = doctor;
-        doctorDropdown.appendChild(option);
-      });
+      showData(filteredData); // Show filtered data based on department
     }
   </script>
 </body>
