@@ -32,6 +32,10 @@
         width: 80%;
       }
     }
+    /* Hide the department column in the table */
+    .hidden-column {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -46,10 +50,10 @@
   </div>
 
   <div class="filter-container">
-    <select id="floorFilter" onchange="applyFilters()">
-      <option value="">Floor - الطابق</option>
-    </select>
     <select id="deptFilter" onchange="applyFilters()">
+      <option value="">Department - القسم</option>
+    </select>
+    <select id="doctorFilter" onchange="applyFilters()">
       <option value="">Dr. Name - اسم الطبيب</option>
     </select>
   </div>
@@ -61,6 +65,7 @@
           <th>Floor</th>
           <th>Dept-Name</th>
           <th>Specialty</th>
+          <th class="hidden-column">Department (Hidden)</th> <!-- Hidden column -->
         </tr>
       </thead>
       <tbody></tbody>
@@ -88,18 +93,16 @@
     }
 
     function populateFilters(data) {
-      var floors = new Set(), depts = new Set();
+      var depts = new Set(), doctors = new Set();
       data.forEach(row => {
-        floors.add(row["Floor"]);
         depts.add(row["DeptName"].replace(/"([^\"]+)"/g, '').trim());
       });
-      fillDropdown("floorFilter", floors);
       fillDropdown("deptFilter", depts);
     }
 
     function fillDropdown(id, values) {
       var select = document.getElementById(id);
-      select.innerHTML = select.id === "floorFilter" ? '<option value="">Floor - الطابق</option>' : '<option value="">Dr. Name - اسم الطبيب</option>';
+      select.innerHTML = id === "deptFilter" ? '<option value="">Department - القسم</option>' : '<option value="">Dr. Name - اسم الطبيب</option>';
       values.forEach(value => {
         var option = document.createElement("option");
         option.textContent = value;
@@ -114,23 +117,25 @@
       var groupedData = {};
       data.forEach(row => {
         var floor = row["Floor"] || "Unknown";
+        var dept = row["DeptName"].replace(/"([^\"]+)"/g, '').trim();
         if (!groupedData[floor]) {
           groupedData[floor] = [];
         }
-        groupedData[floor].push(row);
+        groupedData[floor].push({ row, dept });
       });
 
       for (var floor in groupedData) {
         var sectionHeader = document.createElement("tr");
-        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
+        sectionHeader.innerHTML = `<td colspan="4" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor} - ${groupedData[floor][0].dept}</td>`;
         tbody.appendChild(sectionHeader);
 
-        groupedData[floor].forEach(function(row) {
+        groupedData[floor].forEach(function(item) {
           var tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${floor}</td>
-            <td>${row["DeptName"].replace(/"([^\"]+)"/g, '').trim()}</td>
-            <td>${row["Specialty"].replace(/"([^\"]+)"/g, '').trim()}</td>
+            <td>${item.row["DeptName"].replace(/"([^\"]+)"/g, '').trim()}</td>
+            <td>${item.row["Specialty"].replace(/"([^\"]+)"/g, '').trim()}</td>
+            <td class="hidden-column">${item.dept}</td> <!-- Hidden department column -->
           `;
           tbody.appendChild(tr);
         });
@@ -138,13 +143,29 @@
     }
 
     function applyFilters() {
-      var floorValue = document.getElementById("floorFilter").value;
       var deptValue = document.getElementById("deptFilter").value;
+      var doctorValue = document.getElementById("doctorFilter").value;
       var filteredData = allData.filter(row => 
-        (!floorValue || row["Floor"] === floorValue) &&
-        (!deptValue || row["DeptName"].replace(/"([^\"]+)"/g, '').trim() === deptValue)
+        (!deptValue || row["DeptName"].replace(/"([^\"]+)"/g, '').trim() === deptValue) &&
+        (!doctorValue || row["Doctor"].replace(/"([^\"]+)"/g, '').trim() === doctorValue)
       );
       showData(filteredData);
+    }
+
+    function searchTable() {
+      var input = document.getElementById('search');
+      var filter = input.value.toLowerCase();
+      var rows = document.querySelectorAll('#doctorTable tbody tr');
+      
+      rows.forEach(row => {
+        var textContent = row.textContent || row.innerText;
+        var departmentText = row.cells[3].textContent || ''; // Get the hidden department column's content
+        if (textContent.toLowerCase().includes(filter) || departmentText.toLowerCase().includes(filter)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
     }
 
     fetchData();
