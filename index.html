@@ -8,19 +8,28 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 </head>
 <body>
-  <!-- Header Section -->
   <header class="header">
     <h1>Find Your Doctor</h1>
   </header>
 
-  <!-- Search Section -->
   <div class="search-container">
     <label for="search">Search for a Doctor, Department, or Specialty:</label>
     <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
-    <input type="text" id="search" placeholder="Search for a department, service, or specialty..." onkeyup="searchTable()">
+    <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
   </div>
 
-  <div id="doctorTable"></div> <!-- Dynamic content will be loaded here -->
+  <div class="table-container">
+    <table id="doctorTable">
+      <thead>
+        <tr>
+          <th>Floor</th>
+          <th>Dept-Name</th>
+          <th>Specialty</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
     var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
@@ -30,89 +39,43 @@
       header: true,
       dynamicTyping: true,
       complete: function(results) {
-        console.log("CSV Headers:", results.meta.fields); // Debugging log
-        console.log("First Row Data:", results.data[0]); // Debugging log
+        console.log("CSV Headers:", results.meta.fields); // Debugging
+        console.log("Sample Data:", results.data[0]); // Debugging
         showData(results.data);
       },
       error: function(error) {
-        console.error("Error loading CSV:", error); // Error logging
+        console.error("Error loading CSV:", error);
       }
     });
 
     function showData(data) {
-      var tableContainer = document.getElementById('doctorTable');
-      tableContainer.innerHTML = ''; // Clear any existing content
+      var tbody = document.querySelector("#doctorTable tbody");
+      tbody.innerHTML = ""; // Clear previous data
 
-      // Group data by Floor
-      var floors = {};
       data.forEach(function(row) {
-        if (!floors[row['Floor']]) {
-          floors[row['Floor']] = [];
-        }
-        floors[row['Floor']].push(row);
-      });
+        var tr = document.createElement("tr");
 
-      // Iterate through each floor and create a section
-      for (var floor in floors) {
-        var section = document.createElement('section');
+        var floor = row["Floor"] || "N/A";
+        var deptName = row["DeptName"] || "N/A";
+        var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "N/A";
 
-        // Create a floor header
-        var floorHeader = document.createElement('h2');
-        floorHeader.innerText = floor;
-        section.appendChild(floorHeader);
-
-        // Create the table for this floor
-        var table = document.createElement('table');
-        table.innerHTML = `
-          <thead>
-            <tr>
-              <th>Floor</th>
-              <th>Dept-Name</th>
-              <th>Specialty</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${floors[floor].map(function(row) {
-              return `
-                <tr>
-                  <td>${row['Floor'] || 'N/A'}</td>
-                  <td>${row['DeptName'] || 'N/A'}</td>
-                  <td>${row['Specialty'] ? row['Specialty'].replace(/\n/g, '<br>') : 'N/A'}</td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
+        tr.innerHTML = `
+          <td>${floor}</td>
+          <td>${deptName}</td>
+          <td>${specialty}</td>
         `;
 
-        section.appendChild(table);
-        var divider = document.createElement('hr');
-        section.appendChild(divider);
-        tableContainer.appendChild(section);
-      }
+        tbody.appendChild(tr);
+      });
     }
 
     function searchTable() {
-      var input = document.getElementById('search').value.toLowerCase();
-      var sections = document.querySelectorAll('#doctorTable section');
+      var input = document.getElementById("search").value.toLowerCase();
+      var rows = document.querySelectorAll("#doctorTable tbody tr");
 
-      sections.forEach(function(section) {
-        var rows = section.querySelectorAll('table tbody tr');
-        var isAnyRowVisible = false;
-
-        rows.forEach(function(row) {
-          var floor = row.cells[0].textContent.toLowerCase();
-          var department = row.cells[1].textContent.toLowerCase();
-          var specialty = row.cells[2].textContent.toLowerCase();
-
-          if (floor.includes(input) || department.includes(input) || specialty.includes(input)) {
-            row.style.display = '';
-            isAnyRowVisible = true;
-          } else {
-            row.style.display = 'none';
-          }
-        });
-
-        section.style.display = isAnyRowVisible ? '' : 'none';
+      rows.forEach(function(row) {
+        var text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? "" : "none";
       });
     }
   </script>
