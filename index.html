@@ -45,6 +45,9 @@
     tr:hover {
       background-color: #ddd;
     }
+    #departmentColumn {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -62,10 +65,8 @@
     <select id="doctor" class="dropdown">
       <option value="">Select Doctor</option>
     </select>
-  </div>
 
-  <div class="search-container">
-    <label for="search">Search for a Doctor, Department, or Specialty:</label>
+    <label for="search">Search:</label>
     <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
   </div>
 
@@ -76,6 +77,7 @@
           <th>Floor</th>
           <th>Dept-Name</th>
           <th>Specialty</th>
+          <th id="departmentColumn">Department</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -92,43 +94,23 @@
       dynamicTyping: true,
       complete: function(results) {
         allData = results.data;
-        populateDropdowns(allData);
         showData(allData);
+        populateDepartmentDropdown(allData);
       },
       error: function(error) {
         console.error("Error loading CSV:", error);
       }
     });
 
-    function populateDropdowns(data) {
-      // Get unique departments
-      var departments = [...new Set(data.map(item => item["DeptName"] || "Unknown"))];
-      var departmentDropdown = document.getElementById("department");
-      
+    function populateDepartmentDropdown(data) {
+      const departmentSelect = document.getElementById('department');
+      const departments = [...new Set(data.map(row => row["DeptName"]))];
       departments.forEach(department => {
-        var option = document.createElement("option");
+        const option = document.createElement('option');
         option.value = department;
         option.textContent = department;
-        departmentDropdown.appendChild(option);
+        departmentSelect.appendChild(option);
       });
-    }
-
-    function updateDoctors() {
-      var department = document.getElementById("department").value;
-      var doctorDropdown = document.getElementById("doctor");
-      doctorDropdown.innerHTML = '<option value="">Select Doctor</option>';
-
-      if (department) {
-        var filteredDoctors = allData.filter(item => item["DeptName"] === department);
-        var doctorNames = [...new Set(filteredDoctors.map(item => item["DoctorName"] || "Unknown"))];
-
-        doctorNames.forEach(doctor => {
-          var option = document.createElement("option");
-          option.value = doctor;
-          option.textContent = doctor;
-          doctorDropdown.appendChild(option);
-        });
-      }
     }
 
     function showData(data) {
@@ -137,17 +119,14 @@
       var groupedData = {};
       data.forEach(function(row) {
         var floor = row["Floor"] || "Unknown";
+        var department = row["DeptName"] || "Unknown";
         if (!groupedData[floor]) {
           groupedData[floor] = [];
         }
-        groupedData[floor].push(row);
+        groupedData[floor].push({ ...row, department });
       });
 
       for (var floor in groupedData) {
-        var sectionHeader = document.createElement("tr");
-        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
-        tbody.appendChild(sectionHeader);
-
         groupedData[floor].forEach(function(row) {
           var tr = document.createElement("tr");
           var deptName = row["DeptName"] || "";
@@ -158,13 +137,30 @@
 
           tr.innerHTML = `
             <td>${floor}</td>
-            <td style="color: #691636;">${deptNameForDisplay}</td>
-            <td style="color: #691636;">${specialtyForDisplay}</td>
+            <td>${deptNameForDisplay}</td>
+            <td>${specialtyForDisplay}</td>
+            <td id="departmentColumn">${row.department}</td>
           `;
           tr.dataset.deptName = deptName.toLowerCase();
           tr.dataset.specialty = specialty.toLowerCase();
 
           tbody.appendChild(tr);
+        });
+      }
+    }
+
+    function updateDoctors() {
+      const department = document.getElementById('department').value;
+      const doctorSelect = document.getElementById('doctor');
+      doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+
+      if (department) {
+        const doctors = allData.filter(row => row["DeptName"] === department).map(row => row["Doctor"]);
+        doctors.forEach(doctor => {
+          const option = document.createElement('option');
+          option.value = doctor;
+          option.textContent = doctor;
+          doctorSelect.appendChild(option);
         });
       }
     }
@@ -180,7 +176,8 @@
       var filteredData = allData.filter(row => {
         var deptName = row["DeptName"] ? row["DeptName"].toLowerCase() : "";
         var specialty = row["Specialty"] ? row["Specialty"].toLowerCase() : "";
-        return (deptName + " " + specialty).includes(input);
+        var doctorName = row["Doctor"] ? row["Doctor"].toLowerCase() : "";
+        return (deptName + " " + specialty + " " + doctorName).includes(input);
       });
       showData(filteredData);
       if (filteredData.length > 0) {
