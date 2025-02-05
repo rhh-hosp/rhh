@@ -52,46 +52,103 @@
       var tbody = document.querySelector("#doctorTable tbody");
       tbody.innerHTML = ""; // Clear previous data
 
+      // Group results by floor
+      var groupedData = {};
       data.forEach(function(row) {
-        var tr = document.createElement("tr");
-
-        var floor = row["Floor"] || "";
-        var deptName = row["DeptName"] || "";
-        var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
-
-        // Remove any quoted text from the display (but still keep it for search purposes)
-        var deptNameForDisplay = deptName.replace(/"([^"]+)"/g, '').trim();
-        var specialtyForDisplay = specialty.replace(/"([^"]+)"/g, '').trim();
-
-        // Make sure to add the original row to the search by keeping the quoted content.
-        tr.innerHTML = `
-          <td>${floor}</td>
-          <td>${deptNameForDisplay}</td>
-          <td>${specialtyForDisplay}</td>
-        `;
-
-        // Set a custom data attribute for the unmodified content to preserve the quoted words for search
-        tr.dataset.deptName = deptName.toLowerCase();
-        tr.dataset.specialty = specialty.toLowerCase();
-
-        tbody.appendChild(tr);
+        var floor = row["Floor"] || "Unknown"; // Default to 'Unknown' if no floor is specified
+        if (!groupedData[floor]) {
+          groupedData[floor] = [];
+        }
+        groupedData[floor].push(row);
       });
+
+      // For each floor group, add a section header and the rows
+      for (var floor in groupedData) {
+        var floorGroup = groupedData[floor];
+
+        // Add the section header
+        var sectionHeader = document.createElement("tr");
+        sectionHeader.innerHTML = `
+          <td colspan="3" style="font-weight: bold; background-color: #ddd; text-align: center;">${floor}</td>
+        `;
+        tbody.appendChild(sectionHeader);
+
+        // Add the rows for this floor
+        floorGroup.forEach(function(row) {
+          var tr = document.createElement("tr");
+
+          var deptName = row["DeptName"] || "";
+          var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
+
+          // Remove any quoted text from the display
+          var deptNameForDisplay = deptName.replace(/"([^"]+)"/g, '').trim();
+          var specialtyForDisplay = specialty.replace(/"([^"]+)"/g, '').trim();
+
+          tr.innerHTML = `
+            <td>${floor}</td>
+            <td>${deptNameForDisplay}</td>
+            <td>${specialtyForDisplay}</td>
+          `;
+
+          // Set a custom data attribute for the unmodified content to preserve the quoted words for search
+          tr.dataset.deptName = deptName.toLowerCase();
+          tr.dataset.specialty = specialty.toLowerCase();
+
+          tbody.appendChild(tr);
+        });
+      }
     }
 
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
       var rows = document.querySelectorAll("#doctorTable tbody tr");
-
+      
       rows.forEach(function(row) {
         var deptNameText = row.dataset.deptName || "";
         var specialtyText = row.dataset.specialty || "";
-
-        // Combine the text of both columns for searching
+        
         var textToSearch = deptNameText + " " + specialtyText;
 
         // If the search term matches any of the department or specialty values, show the row
         row.style.display = textToSearch.includes(input) ? "" : "none";
       });
+
+      // Group rows by their visibility after search
+      groupRowsByFloor();
+    }
+
+    function groupRowsByFloor() {
+      var tbody = document.querySelector("#doctorTable tbody");
+      var rows = Array.from(tbody.querySelectorAll("tr"));
+      var groupedRows = {};
+
+      // Group the rows by floor
+      rows.forEach(function(row) {
+        if (row.querySelector('td')) { // Ignore headers
+          var floor = row.querySelector('td').innerText.trim();
+          if (!groupedRows[floor]) {
+            groupedRows[floor] = [];
+          }
+          groupedRows[floor].push(row);
+        }
+      });
+
+      // Clear the table body and re-add rows with section headers
+      tbody.innerHTML = '';
+
+      for (var floor in groupedRows) {
+        // Add the section header
+        var sectionHeader = document.createElement("tr");
+        sectionHeader.innerHTML = `
+          <td colspan="3" style="font-weight: bold; background-color: #ddd; text-align: center;">${floor}</td>
+        `;
+        tbody.appendChild(sectionHeader);
+
+        // Add the rows for this floor
+        groupedRows[floor].forEach(function(row) {
+          tbody.appendChild(row);
+        });
+      }
     }
   </script>
 </body>
