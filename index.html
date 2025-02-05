@@ -32,8 +32,7 @@
   </div>
 
   <script>
-    var allData = [];  // This will hold all the data for resetting the table
-
+    var allData = [];
     var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
 
     Papa.parse(csvUrl, {
@@ -41,9 +40,8 @@
       header: true,
       dynamicTyping: true,
       complete: function(results) {
-        console.log("CSV Headers:", results.meta.fields); // Debugging
-        console.log("Sample Data:", results.data[0]); // Debugging
-        showData(results.data);
+        allData = results.data;
+        showData(allData);
       },
       error: function(error) {
         console.error("Error loading CSV:", error);
@@ -51,13 +49,11 @@
     });
 
     function showData(data) {
-      allData = data;  // Store the data globally
       var tbody = document.querySelector("#doctorTable tbody");
-      tbody.innerHTML = ""; // Clear previous data
-
+      tbody.innerHTML = "";
       var groupedData = {};
       data.forEach(function(row) {
-        var floor = row["Floor"] || "Unknown"; // Default to 'Unknown' if no floor is specified
+        var floor = row["Floor"] || "Unknown";
         if (!groupedData[floor]) {
           groupedData[floor] = [];
         }
@@ -65,14 +61,11 @@
       });
 
       for (var floor in groupedData) {
-        var floorGroup = groupedData[floor];
         var sectionHeader = document.createElement("tr");
-        sectionHeader.innerHTML = `
-          <td colspan="3" style="font-weight: bold; background-color: #f2f2f2; text-align: center;">${floor}</td>
-        `;
+        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
         tbody.appendChild(sectionHeader);
 
-        floorGroup.forEach(function(row) {
+        groupedData[floor].forEach(function(row) {
           var tr = document.createElement("tr");
           var deptName = row["DeptName"] || "";
           var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
@@ -85,7 +78,6 @@
             <td>${deptNameForDisplay}</td>
             <td>${specialtyForDisplay}</td>
           `;
-
           tr.dataset.deptName = deptName.toLowerCase();
           tr.dataset.specialty = specialty.toLowerCase();
 
@@ -96,49 +88,20 @@
 
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
-      var rows = document.querySelectorAll("#doctorTable tbody tr");
-
-      var groupedRows = {};
-
-      rows.forEach(function(row) {
-        if (row.querySelector('td')) { // Ignore headers
-          var floor = row.querySelector('td').innerText.trim();
-          if (!groupedRows[floor]) {
-            groupedRows[floor] = [];
-          }
-          groupedRows[floor].push(row);
-        }
-      });
-
-      // Clear the table body and re-add rows with section headers
       var tbody = document.querySelector("#doctorTable tbody");
       tbody.innerHTML = '';
-
       if (input.trim() === "") {
-        // If the search input is empty, show all data
         showData(allData);
         return;
       }
-
-      // Only show the floors with visible rows based on search
-      for (var floor in groupedRows) {
-        var visibleRows = groupedRows[floor].filter(function(row) {
-          var deptNameText = row.dataset.deptName || "";
-          var specialtyText = row.dataset.specialty || "";
-          return (deptNameText + " " + specialtyText).includes(input);
-        });
-
-        if (visibleRows.length > 0) {
-          var sectionHeader = document.createElement("tr");
-          sectionHeader.innerHTML = `
-            <td colspan="3" style="font-weight: bold; background-color: #f2f2f2; text-align: center;">${floor}</td>
-          `;
-          tbody.appendChild(sectionHeader);
-
-          visibleRows.forEach(function(row) {
-            tbody.appendChild(row);
-          });
-        }
+      var filteredData = allData.filter(row => {
+        var deptName = row["DeptName"] ? row["DeptName"].toLowerCase() : "";
+        var specialty = row["Specialty"] ? row["Specialty"].toLowerCase() : "";
+        return (deptName + " " + specialty).includes(input);
+      });
+      showData(filteredData);
+      if (filteredData.length > 0) {
+        document.querySelector("#doctorTable").scrollIntoView({ behavior: "smooth" });
       }
     }
   </script>
