@@ -59,6 +59,11 @@
         var deptName = row["DeptName"] || "";
         var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
 
+        // Remove the text inside quotes for display (but keep the rest)
+        deptName = deptName.replace(/"([^"]+)"/g, '').trim(); // Remove quoted text
+        specialty = specialty.replace(/"([^"]+)"/g, '').trim(); // Remove quoted text
+
+        // Replace the quoted part with an empty string, but we need to keep that part for searching
         tr.innerHTML = `
           <td>${floor}</td>
           <td>${deptName}</td>
@@ -75,7 +80,12 @@
 
       rows.forEach(function(row) {
         var text = row.innerText.toLowerCase();
-        row.style.display = text.includes(input) ? "" : "none";
+
+        // Get all text (including quoted parts) for matching
+        var searchText = row.innerHTML.toLowerCase();
+        
+        // If the search term is found within the unquoted parts of the text
+        row.style.display = searchText.includes(input) ? "" : "none";
       });
     }
   </script>
