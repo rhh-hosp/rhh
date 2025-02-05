@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doctor Search</title>
+  <title></title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 </head>
@@ -12,15 +12,11 @@
     <h1></h1>
   </header>
 
-  <!-- Search Section with Background Same as Website -->
-  <div class="search-container" style="background-image: url('https://github.com/ykhafaja/my-html-site/blob/main/Background.jpg?raw=true'); background-size: cover; background-position: center;">
+  <div class="search-container">
     <label for="search">Search for a Doctor, Department, or Specialty:</label>
     <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
     <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
   </div>
-
-  <!-- Grouped Results Display Below the Search Bar -->
-  <div id="groupedResults" class="grouped-results"></div>
 
   <div class="table-container">
     <table id="doctorTable">
@@ -76,59 +72,11 @@
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
       var rows = document.querySelectorAll("#doctorTable tbody tr");
-      var groupedResults = {};
 
       rows.forEach(function(row) {
         var text = row.innerText.toLowerCase();
-        var floor = row.querySelector("td").innerText; // Get the floor (section) from the first column
-        if (text.includes(input)) {
-          if (!groupedResults[floor]) {
-            groupedResults[floor] = [];
-          }
-          groupedResults[floor].push(row);
-        }
+        row.style.display = text.includes(input) ? "" : "none";
       });
-
-      displayGroupedResults(groupedResults); // Show the grouped results below the search bar
-    }
-
-    function displayGroupedResults(groupedResults) {
-      var groupedResultsDiv = document.getElementById("groupedResults");
-      groupedResultsDiv.innerHTML = ""; // Clear previous results
-
-      for (var floor in groupedResults) {
-        if (floor === "Ground Floor") {
-          floor = "Ground Floor"; // Fix for Ground Floor
-        }
-
-        var sectionDiv = document.createElement("div");
-        sectionDiv.classList.add("popup-section");
-        var sectionTitle = document.createElement("h3");
-        sectionTitle.innerText = `Floor: ${floor}`;
-        sectionDiv.appendChild(sectionTitle);
-
-        var table = document.createElement("table");
-        var tableHead = document.createElement("thead");
-        tableHead.innerHTML = `
-          <tr>
-            <th>Floor</th>
-            <th>Dept-Name</th>
-            <th>Specialty</th>
-          </tr>
-        `;
-        table.appendChild(tableHead);
-
-        var tableBody = document.createElement("tbody");
-        groupedResults[floor].forEach(function(row) {
-          var tr = document.createElement("tr");
-          tr.innerHTML = row.innerHTML; // Copy row content from the table
-          tableBody.appendChild(tr);
-        });
-
-        table.appendChild(tableBody);
-        sectionDiv.appendChild(table);
-        groupedResultsDiv.appendChild(sectionDiv);
-      }
     }
   </script>
 </body>
