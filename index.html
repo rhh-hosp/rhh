@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title></title>
+  <title>Doctor Search</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 </head>
 <body>
   <header class="header">
-    <h1></h1>
+    <h1>Doctor, Department, and Specialty Search</h1>
   </header>
 
   <div class="search-container">
@@ -32,6 +32,8 @@
   </div>
 
   <script>
+    var allData = [];  // This will hold all the data for resetting the table
+
     var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
 
     Papa.parse(csvUrl, {
@@ -49,10 +51,10 @@
     });
 
     function showData(data) {
+      allData = data;  // Store the data globally
       var tbody = document.querySelector("#doctorTable tbody");
       tbody.innerHTML = ""; // Clear previous data
 
-      // Group results by floor
       var groupedData = {};
       data.forEach(function(row) {
         var floor = row["Floor"] || "Unknown"; // Default to 'Unknown' if no floor is specified
@@ -62,7 +64,6 @@
         groupedData[floor].push(row);
       });
 
-      // For each floor group, add a section header and the rows
       for (var floor in groupedData) {
         var floorGroup = groupedData[floor];
         var sectionHeader = document.createElement("tr");
@@ -71,14 +72,11 @@
         `;
         tbody.appendChild(sectionHeader);
 
-        // Add the rows for this floor
         floorGroup.forEach(function(row) {
           var tr = document.createElement("tr");
-
           var deptName = row["DeptName"] || "";
           var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
 
-          // Remove any quoted text from the display
           var deptNameForDisplay = deptName.replace(/"([^"]+)"/g, '').trim();
           var specialtyForDisplay = specialty.replace(/"([^"]+)"/g, '').trim();
 
@@ -88,7 +86,6 @@
             <td>${specialtyForDisplay}</td>
           `;
 
-          // Set a custom data attribute for the unmodified content to preserve the quoted words for search
           tr.dataset.deptName = deptName.toLowerCase();
           tr.dataset.specialty = specialty.toLowerCase();
 
@@ -117,15 +114,20 @@
       var tbody = document.querySelector("#doctorTable tbody");
       tbody.innerHTML = '';
 
+      if (input.trim() === "") {
+        // If the search input is empty, show all data
+        showData(allData);
+        return;
+      }
+
+      // Only show the floors with visible rows based on search
       for (var floor in groupedRows) {
-        // Filter rows for this floor based on the search term
         var visibleRows = groupedRows[floor].filter(function(row) {
           var deptNameText = row.dataset.deptName || "";
           var specialtyText = row.dataset.specialty || "";
           return (deptNameText + " " + specialtyText).includes(input);
         });
 
-        // Only add the floor if there are visible rows for it
         if (visibleRows.length > 0) {
           var sectionHeader = document.createElement("tr");
           sectionHeader.innerHTML = `
@@ -133,7 +135,6 @@
           `;
           tbody.appendChild(sectionHeader);
 
-          // Add the rows for this floor
           visibleRows.forEach(function(row) {
             tbody.appendChild(row);
           });
