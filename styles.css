@@ -1,3 +1,107 @@
+/* Global Background */
+body {
+  background-image: url('https://github.com/ykhafaja/my-html-site/blob/main/Background.jpg?raw=true');
+  background-size: cover;
+  background-position: center;
+  font-family: 'Georgia', serif;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Header Section */
+.header {
+  background-image: url('https://github.com/ykhafaja/my-html-site/blob/main/About_banner-about.jpg?raw=true');
+  background-size: cover;
+  background-position: center;
+  height: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  padding: 0 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Search Section */
+.search-container {
+  margin: 20px 0;
+  text-align: center;
+  width: 100%;
+}
+
+.search-container label {
+  font-size: 1.2rem;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 10px;
+  color: #691636;
+}
+
+.search-container .arabic-label {
+  font-family: 'Almarai', sans-serif;
+}
+
+input[type="text"] {
+  width: 80%;
+  padding: 12px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  border: 1px solid #691636;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Table Wrapper */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+  padding: 14px;
+  border: 1px solid #ddd;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 16px;
+  color: #691636;
+  white-space: pre-wrap; /* Allows multi-line text */
+  word-wrap: break-word;
+}
+
+th {
+  background-color: #691636;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+td {
+  background-color: #f9f9f9;
+}
+
+/* Alternating row colors */
+tr:nth-child(even) {
+  background-color: #f4f4f4;
+}
+
+tr:hover {
+  background-color: #ddd;
+}
+
 /* Popup Modal Styles */
 .popup {
   display: none;
@@ -13,7 +117,7 @@
 }
 
 .popup-content {
-  background-color: white;
+  background-color: #74613c;  /* Updated background color */
   padding: 20px;
   border-radius: 8px;
   width: 80%;
@@ -23,7 +127,7 @@
 }
 
 .popup h2 {
-  color: #691636;
+  color: #691636;  /* Updated text color */
   text-align: center;
   font-size: 1.8rem;
 }
@@ -50,6 +154,8 @@
   vertical-align: middle;
   font-size: 16px;
   color: #691636;
+  white-space: pre-wrap; /* Maintain line breaks */
+  word-wrap: break-word;
 }
 
 .popup th {
@@ -70,4 +176,20 @@
 
 .popup tr:hover {
   background-color: #ddd;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  th, td {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  table {
+    table-layout: fixed;
+  }
+
+  .table-container {
+    overflow-x: hidden;
+  }
 }
