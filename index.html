@@ -19,8 +19,12 @@
   </div>
 
   <div class="filter-container">
-    <select id="deptFilter" onchange="applyFilters()">
+    <select id="deptFilter" onchange="updateDoctorFilter()">
       <option value="">Department - القسم</option>
+    </select>
+
+    <select id="doctorFilter" onchange="applyFilters()">
+      <option value="">Doctor - طبيب</option>
     </select>
   </div>
 
@@ -79,6 +83,18 @@
       });
     }
 
+    // Filter the doctors based on the selected department
+    function updateDoctorFilter() {
+      var deptValue = document.getElementById("deptFilter").value;
+      var doctors = new Set();
+      allData.forEach(function(row) {
+        if (row["Department"] && row["Department"].toLowerCase() === deptValue.toLowerCase()) {
+          doctors.add(row["DeptName"]);
+        }
+      });
+      fillDropdown("doctorFilter", doctors);
+    }
+
     // Display the data in the table
     function showData(data) {
       var tbody = document.querySelector("#doctorTable tbody");
@@ -111,16 +127,20 @@
             <td>${specialtyForDisplay}</td>
           `;
           tr.dataset.deptName = row["Department"] ? row["Department"].toLowerCase() : "";
+          tr.dataset.doctor = deptNameForDisplay.toLowerCase();
           tbody.appendChild(tr);
         });
       }
     }
 
-    // Apply filters based on selected department
+    // Apply filters based on department and doctor
     function applyFilters() {
       var deptValue = document.getElementById("deptFilter").value;
+      var doctorValue = document.getElementById("doctorFilter").value;
       var filteredData = allData.filter(function(row) {
-        return !deptValue || (row["Department"] && row["Department"].toLowerCase() === deptValue.toLowerCase());
+        var deptMatch = !deptValue || (row["Department"] && row["Department"].toLowerCase() === deptValue.toLowerCase());
+        var doctorMatch = !doctorValue || (row["DeptName"] && row["DeptName"].toLowerCase() === doctorValue.toLowerCase());
+        return deptMatch && doctorMatch;
       });
       showData(filteredData);
     }
