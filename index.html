@@ -104,7 +104,7 @@
 
     function populateDepartmentDropdown(data) {
       const departmentSelect = document.getElementById('department');
-      const departments = [...new Set(data.map(row => row["DeptName"]))];
+      const departments = [...new Set(data.map(row => row["Department"]))];  // Use the Department column (4th column)
       departments.forEach(department => {
         const option = document.createElement('option');
         option.value = department;
@@ -119,7 +119,7 @@
       var groupedData = {};
       data.forEach(function(row) {
         var floor = row["Floor"] || "Unknown";
-        var department = row["DeptName"] || "Unknown";
+        var department = row["Department"] || "Unknown";  // Pull data from the hidden department column
         if (!groupedData[floor]) {
           groupedData[floor] = [];
         }
@@ -127,7 +127,13 @@
       });
 
       for (var floor in groupedData) {
-        groupedData[floor].forEach(function(row) {
+        var floorGroup = groupedData[floor];
+        var floorRow = document.createElement('tr');
+        floorRow.classList.add('floor-header');
+        floorRow.innerHTML = `<td colspan="4" style="background-color: #c8d9e1; font-weight: bold;">Floor: ${floor}</td>`;
+        tbody.appendChild(floorRow);
+
+        floorGroup.forEach(function(row) {
           var tr = document.createElement("tr");
           var deptName = row["DeptName"] || "";
           var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
@@ -155,7 +161,7 @@
       doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
 
       if (department) {
-        const doctors = allData.filter(row => row["DeptName"] === department).map(row => row["Doctor"]);
+        const doctors = allData.filter(row => row["Department"] === department).map(row => row["Doctor"]);
         doctors.forEach(doctor => {
           const option = document.createElement('option');
           option.value = doctor;
@@ -174,7 +180,7 @@
         return;
       }
       var filteredData = allData.filter(row => {
-        var deptName = row["DeptName"] ? row["DeptName"].toLowerCase() : "";
+        var deptName = row["Department"] ? row["Department"].toLowerCase() : "";
         var specialty = row["Specialty"] ? row["Specialty"].toLowerCase() : "";
         var doctorName = row["Doctor"] ? row["Doctor"].toLowerCase() : "";
         return (deptName + " " + specialty + " " + doctorName).includes(input);
