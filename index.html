@@ -6,10 +6,119 @@
   <title>Doctor Search</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  <style>
+    /* General body styling */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    /* Header styling */
+    .header h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Search container styling */
+    .search-container {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .search-container input {
+      padding: 10px;
+      font-size: 16px;
+      width: 80%;
+      max-width: 400px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    /* Filter container styling */
+    .filter-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .filter-container select {
+      font-size: 16px;
+      padding: 12px;
+      width: 80%;
+      max-width: 400px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      transition: all 0.3s ease;
+    }
+
+    .filter-container select:hover {
+      border-color: #777;
+    }
+
+    .filter-container label {
+      font-size: 18px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    /* Table styling */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 16px;
+    }
+
+    th {
+      background-color: #74613C;
+      color: white;
+      padding: 10px;
+    }
+
+    td {
+      padding: 8px;
+      border: 1px solid #ddd;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    tr td:first-child {
+      font-weight: bold;
+    }
+
+    /* Styling for section headers in the table */
+    .section-header {
+      background-color: #d9d9d9;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+    }
+
+    /* Styling for mobile responsiveness */
+    @media (max-width: 768px) {
+      .search-container input, .filter-container select {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="header">
-    <h1></h1>
+    <h1>Doctor Search</h1>
   </header>
 
   <div class="search-container">
@@ -19,12 +128,14 @@
   </div>
 
   <div class="filter-container">
+    <label for="deptFilter">Department - القسم</label>
     <select id="deptFilter" onchange="updateDoctorFilter()">
-      <option value="">Department - القسم</option>
+      <option value="">Select Department</option>
     </select>
 
+    <label for="doctorFilter">Doctor Name - اسم الطبيب</label>
     <select id="doctorFilter" onchange="applyFilters()">
-      <option value="">Doctor - طبيب</option>
+      <option value="">Select Doctor</option>
     </select>
   </div>
 
@@ -74,7 +185,7 @@
     // Fill the dropdown with the department values
     function fillDropdown(id, values) {
       var select = document.getElementById(id);
-      select.innerHTML = '<option value="">Department - القسم</option>';
+      select.innerHTML = '<option value="">Select Department</option>';
       values.forEach(function(value) {
         var option = document.createElement("option");
         option.textContent = value;
@@ -110,7 +221,8 @@
 
       for (var floor in groupedData) {
         var sectionHeader = document.createElement("tr");
-        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
+        sectionHeader.classList.add("section-header");
+        sectionHeader.innerHTML = `<td colspan="3">${floor}</td>`;
         tbody.appendChild(sectionHeader);
 
         groupedData[floor].forEach(function(row) {
