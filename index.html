@@ -62,28 +62,29 @@
     var allData = [];
     var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
 
-    Papa.parse(csvUrl, {
-      download: true,
-      header: true,
-      dynamicTyping: true,
-      complete: function(results) {
-        allData = results.data;
-        populateFilters(allData);
-        showData(allData);
-      },
-      error: function(error) {
-        console.error("Error loading CSV:", error);
-      }
-    });
+    function fetchData() {
+      Papa.parse(csvUrl, {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        complete: function(results) {
+          allData = results.data.filter(row => row["Floor"] && row["DeptName"] && row["Specialty"]);
+          populateFilters(allData);
+          showData(allData);
+        },
+        error: function(error) {
+          console.error("Error loading CSV:", error);
+        }
+      });
+    }
 
     function populateFilters(data) {
       var floors = new Set(), depts = new Set(), specialties = new Set();
       data.forEach(row => {
-        floors.add(row["Floor"] || "Unknown");
-        depts.add(row["DeptName"].replace(/"([^\"]+)"/g, '').trim() || "Unknown");
-        specialties.add(row["Specialty"].replace(/"([^\"]+)"/g, '').trim() || "Unknown");
+        floors.add(row["Floor"]);
+        depts.add(row["DeptName"].replace(/"([^\"]+)"/g, '').trim());
+        specialties.add(row["Specialty"].replace(/"([^\"]+)"/g, '').trim());
       });
-
       fillDropdown("floorFilter", floors);
       fillDropdown("deptFilter", depts);
       fillDropdown("specialtyFilter", specialties);
@@ -91,6 +92,7 @@
 
     function fillDropdown(id, values) {
       var select = document.getElementById(id);
+      select.innerHTML = '<option value="">Select</option>';
       values.forEach(value => {
         var option = document.createElement("option");
         option.textContent = value;
@@ -105,7 +107,7 @@
       data.forEach(row => {
         var tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${row["Floor"] || "Unknown"}</td>
+          <td>${row["Floor"]}</td>
           <td>${row["DeptName"].replace(/"([^\"]+)"/g, '').trim()}</td>
           <td>${row["Specialty"].replace(/"([^\"]+)"/g, '').trim()}</td>
         `;
@@ -133,6 +135,8 @@
       );
       showData(filteredData);
     }
+
+    fetchData();
   </script>
 </body>
 </html>
