@@ -97,16 +97,6 @@
       }
     }
 
-    // Function to check if a row matches the search term
-    function matchesSearchTerm(row) {
-      var input = document.getElementById("search").value.toLowerCase();
-      var deptNameText = row["DeptName"].toLowerCase() || "";
-      var specialtyText = row["Specialty"].toLowerCase() || "";
-      var textToSearch = deptNameText + " " + specialtyText;
-
-      return textToSearch.includes(input);
-    }
-
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
       var rows = document.querySelectorAll("#doctorTable tbody tr");
