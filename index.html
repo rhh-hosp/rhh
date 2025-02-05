@@ -9,13 +9,23 @@
 </head>
 <body>
   <header class="header">
-    <h1></h1>
+    <h1>Doctor, Department, and Specialty Search</h1>
   </header>
 
   <div class="search-container">
     <label for="search">Search for a Doctor, Department, or Specialty:</label>
     <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
-    <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
+    <div class="search-wrapper">
+      <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
+      <button id="clearSearch" onclick="clearSearch()">&times;</button>
+    </div>
+    <div id="autocomplete" class="autocomplete-list"></div>
+    <select id="filterFloor" onchange="searchTable()">
+      <option value="">All Floors</option>
+    </select>
+    <select id="filterDept" onchange="searchTable()">
+      <option value="">All Departments</option>
+    </select>
   </div>
 
   <div class="table-container">
@@ -30,6 +40,7 @@
       <tbody></tbody>
     </table>
   </div>
+  <p id="noResults" style="display:none; text-align:center; color:red; font-weight:bold;">No matches found. Try searching by Specialty or Department.</p>
 
   <script>
     var allData = [];
@@ -41,6 +52,7 @@
       dynamicTyping: true,
       complete: function(results) {
         allData = results.data;
+        populateFilters(allData);
         showData(allData);
       },
       error: function(error) {
@@ -51,58 +63,76 @@
     function showData(data) {
       var tbody = document.querySelector("#doctorTable tbody");
       tbody.innerHTML = "";
+      document.getElementById("noResults").style.display = "none";
+
       var groupedData = {};
-      data.forEach(function(row) {
+      data.forEach(row => {
         var floor = row["Floor"] || "Unknown";
-        if (!groupedData[floor]) {
-          groupedData[floor] = [];
-        }
+        if (!groupedData[floor]) groupedData[floor] = [];
         groupedData[floor].push(row);
       });
 
-      for (var floor in groupedData) {
+      Object.keys(groupedData).forEach(floor => {
         var sectionHeader = document.createElement("tr");
-        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
+        sectionHeader.innerHTML = `<td colspan="3" style="background:#74613C; color:white; text-align:center; font-weight:bold;">${floor}</td>`;
         tbody.appendChild(sectionHeader);
 
-        groupedData[floor].forEach(function(row) {
+        groupedData[floor].forEach(row => {
           var tr = document.createElement("tr");
-          var deptName = row["DeptName"] || "";
-          var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
-
-          var deptNameForDisplay = deptName.replace(/"([^"]+)"/g, '').trim();
-          var specialtyForDisplay = specialty.replace(/"([^"]+)"/g, '').trim();
-
-          tr.innerHTML = `
-            <td>${floor}</td>
-            <td>${deptNameForDisplay}</td>
-            <td>${specialtyForDisplay}</td>
-          `;
-          tr.dataset.deptName = deptName.toLowerCase();
-          tr.dataset.specialty = specialty.toLowerCase();
-
+          tr.innerHTML = `<td>${floor}</td><td>${row["DeptName"] || ""}</td><td>${row["Specialty"] || ""}</td>`;
           tbody.appendChild(tr);
         });
-      }
+      });
     }
 
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
-      var tbody = document.querySelector("#doctorTable tbody");
-      tbody.innerHTML = '';
-      if (input.trim() === "") {
-        showData(allData);
-        return;
-      }
+      var floorFilter = document.getElementById("filterFloor").value;
+      var deptFilter = document.getElementById("filterDept").value;
+      
       var filteredData = allData.filter(row => {
-        var deptName = row["DeptName"] ? row["DeptName"].toLowerCase() : "";
-        var specialty = row["Specialty"] ? row["Specialty"].toLowerCase() : "";
-        return (deptName + " " + specialty).includes(input);
+        var matchesSearch = (row["DeptName"] + " " + row["Specialty"]).toLowerCase().includes(input);
+        var matchesFloor = floorFilter ? row["Floor"] === floorFilter : true;
+        var matchesDept = deptFilter ? row["DeptName"] === deptFilter : true;
+        return matchesSearch && matchesFloor && matchesDept;
       });
+      
       showData(filteredData);
-      if (filteredData.length > 0) {
-        document.querySelector("#doctorTable").scrollIntoView({ behavior: "smooth" });
-      }
+      if (filteredData.length > 0) document.querySelector(".table-container").scrollIntoView({ behavior: "smooth" });
+      else document.getElementById("noResults").style.display = "block";
+    }
+
+    function clearSearch() {
+      document.getElementById("search").value = "";
+      searchTable();
+    }
+
+    function populateFilters(data) {
+      var floorSet = new Set(), deptSet = new Set();
+      data.forEach(row => {
+        if (row["Floor"]) floorSet.add(row["Floor"]);
+        if (row["DeptName"]) deptSet.add(row["DeptName"]);
+      });
+
+      var floorFilter = document.getElementById("filterFloor");
+      floorSet.forEach(floor => floorFilter.innerHTML += `<option value="${floor}">${floor}</option>`);
+
+      var deptFilter = document.getElementById("filterDept");
+      deptSet.forEach(dept => deptFilter.innerHTML += `<option value="${dept}">${dept}</option>`);
+    }
+
+    document.getElementById("search").addEventListener("input", function() {
+      var input = this.value.toLowerCase();
+      var suggestions = allData.map(row => row["DeptName"] + " " + row["Specialty"]).filter(text => text.toLowerCase().includes(input));
+      var autocompleteList = document.getElementById("autocomplete");
+      autocompleteList.innerHTML = suggestions.map(s => `<div onclick="selectSuggestion('${s}')">${s}</div>`).join('');
+      autocompleteList.style.display = suggestions.length ? "block" : "none";
+    });
+
+    function selectSuggestion(value) {
+      document.getElementById("search").value = value;
+      document.getElementById("autocomplete").style.display = "none";
+      searchTable();
     }
   </script>
 </body>
