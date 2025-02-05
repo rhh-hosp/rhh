@@ -15,17 +15,8 @@
   <div class="search-container">
     <label for="search">Search for a Doctor, Department, or Specialty:</label>
     <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
-    <div class="search-wrapper">
-      <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
-      <button id="clearSearch" onclick="clearSearch()">&times;</button>
-    </div>
-    <div id="autocomplete" class="autocomplete-list"></div>
-    <select id="filterFloor" onchange="searchTable()">
-      <option value="">All Floors</option>
-    </select>
-    <select id="filterDept" onchange="searchTable()">
-      <option value="">All Departments</option>
-    </select>
+    <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
+    <div id="searchDropdown" class="dropdown"></div>
   </div>
 
   <div class="table-container">
@@ -40,10 +31,9 @@
       <tbody></tbody>
     </table>
   </div>
-  <p id="noResults" style="display:none; text-align:center; color:red; font-weight:bold;">No matches found. Try searching by Specialty or Department.</p>
 
   <script>
-    var allData = [];
+    var allData = [];  
     var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
 
     Papa.parse(csvUrl, {
@@ -51,9 +41,7 @@
       header: true,
       dynamicTyping: true,
       complete: function(results) {
-        allData = results.data;
-        populateFilters(allData);
-        showData(allData);
+        showData(results.data);
       },
       error: function(error) {
         console.error("Error loading CSV:", error);
@@ -61,78 +49,77 @@
     });
 
     function showData(data) {
+      allData = data;
       var tbody = document.querySelector("#doctorTable tbody");
       tbody.innerHTML = "";
-      document.getElementById("noResults").style.display = "none";
-
+      
       var groupedData = {};
-      data.forEach(row => {
+      data.forEach(function(row) {
         var floor = row["Floor"] || "Unknown";
-        if (!groupedData[floor]) groupedData[floor] = [];
+        if (!groupedData[floor]) {
+          groupedData[floor] = [];
+        }
         groupedData[floor].push(row);
       });
 
-      Object.keys(groupedData).forEach(floor => {
+      for (var floor in groupedData) {
+        var floorGroup = groupedData[floor];
         var sectionHeader = document.createElement("tr");
-        sectionHeader.innerHTML = `<td colspan="3" style="background:#74613C; color:white; text-align:center; font-weight:bold;">${floor}</td>`;
+        sectionHeader.innerHTML = `
+          <td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>
+        `;
         tbody.appendChild(sectionHeader);
 
-        groupedData[floor].forEach(row => {
+        floorGroup.forEach(function(row) {
           var tr = document.createElement("tr");
-          tr.innerHTML = `<td>${floor}</td><td>${row["DeptName"] || ""}</td><td>${row["Specialty"] || ""}</td>`;
+          var deptName = row["DeptName"] || "";
+          var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
+
+          var deptNameForDisplay = deptName.replace(/"([^"]+)"/g, '').trim();
+          var specialtyForDisplay = specialty.replace(/"([^"]+)"/g, '').trim();
+
+          tr.innerHTML = `
+            <td>${floor}</td>
+            <td>${deptNameForDisplay}</td>
+            <td>${specialtyForDisplay}</td>
+          `;
+
+          tr.dataset.deptName = deptName.toLowerCase();
+          tr.dataset.specialty = specialty.toLowerCase();
           tbody.appendChild(tr);
         });
-      });
+      }
     }
 
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
-      var floorFilter = document.getElementById("filterFloor").value;
-      var deptFilter = document.getElementById("filterDept").value;
-      
-      var filteredData = allData.filter(row => {
-        var matchesSearch = (row["DeptName"] + " " + row["Specialty"]).toLowerCase().includes(input);
-        var matchesFloor = floorFilter ? row["Floor"] === floorFilter : true;
-        var matchesDept = deptFilter ? row["DeptName"] === deptFilter : true;
-        return matchesSearch && matchesFloor && matchesDept;
-      });
-      
-      showData(filteredData);
-      if (filteredData.length > 0) document.querySelector(".table-container").scrollIntoView({ behavior: "smooth" });
-      else document.getElementById("noResults").style.display = "block";
-    }
+      var rows = document.querySelectorAll("#doctorTable tbody tr");
+      var dropdown = document.getElementById("searchDropdown");
+      dropdown.innerHTML = "";
+      dropdown.style.display = "none";
 
-    function clearSearch() {
-      document.getElementById("search").value = "";
-      searchTable();
-    }
+      if (input.trim() === "") {
+        showData(allData);
+        return;
+      }
 
-    function populateFilters(data) {
-      var floorSet = new Set(), deptSet = new Set();
-      data.forEach(row => {
-        if (row["Floor"]) floorSet.add(row["Floor"]);
-        if (row["DeptName"]) deptSet.add(row["DeptName"]);
+      var results = [];
+      rows.forEach(function(row) {
+        if (row.querySelector('td')) {
+          var deptNameText = row.dataset.deptName || "";
+          var specialtyText = row.dataset.specialty || "";
+          if ((deptNameText + " " + specialtyText).includes(input)) {
+            results.push(row.cloneNode(true));
+          }
+        }
       });
 
-      var floorFilter = document.getElementById("filterFloor");
-      floorSet.forEach(floor => floorFilter.innerHTML += `<option value="${floor}">${floor}</option>`);
-
-      var deptFilter = document.getElementById("filterDept");
-      deptSet.forEach(dept => deptFilter.innerHTML += `<option value="${dept}">${dept}</option>`);
-    }
-
-    document.getElementById("search").addEventListener("input", function() {
-      var input = this.value.toLowerCase();
-      var suggestions = allData.map(row => row["DeptName"] + " " + row["Specialty"]).filter(text => text.toLowerCase().includes(input));
-      var autocompleteList = document.getElementById("autocomplete");
-      autocompleteList.innerHTML = suggestions.map(s => `<div onclick="selectSuggestion('${s}')">${s}</div>`).join('');
-      autocompleteList.style.display = suggestions.length ? "block" : "none";
-    });
-
-    function selectSuggestion(value) {
-      document.getElementById("search").value = value;
-      document.getElementById("autocomplete").style.display = "none";
-      searchTable();
+      if (results.length > 0) {
+        dropdown.style.display = "block";
+        results.forEach(function(row) {
+          dropdown.appendChild(row);
+        });
+      }
     }
   </script>
 </body>
