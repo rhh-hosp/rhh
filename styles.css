@@ -1,50 +1,3 @@
-/* Global Background */
-body {
-  background-image: url('https://github.com/ykhafaja/my-html-site/blob/main/Background.jpg?raw=true');
-  background-size: cover;
-  background-position: center;
-  font-family: 'Georgia', serif;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-/* Header Section */
-.header {
-  background-image: url('https://github.com/ykhafaja/my-html-site/blob/main/About_banner-about.jpg?raw=true');
-  background-size: cover;
-  background-position: center;
-  height: 250px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  text-align: center;
-  font-size: 2rem;
-  font-weight: bold;
-  padding: 0 20px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Search Section */
-.search-container {
-  margin: 20px 0;
-  text-align: center;
-  width: 100%;
-}
-
-input[type="text"] {
-  width: 80%;
-  padding: 12px;
-  margin-bottom: 20px;
-  font-size: 16px;
-  border: 1px solid #691636;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
 /* Modal (Pop-out) */
 .modal {
   display: none; /* Hidden by default */
@@ -61,43 +14,28 @@ input[type="text"] {
 }
 
 .modal-content {
-  background-color: #fefefe;
+  background-color: #f9f9f9; /* Same as table row background */
   margin: 5% auto;
   padding: 20px;
-  border: 1px solid #888;
+  border: 1px solid #ddd;
   width: 80%;
   max-width: 600px;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-/* Table Wrapper */
-.table-container {
-  width: 100%;
-  overflow-x: auto;
-  display: block;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-th, td {
+.modal-content h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #691636; /* Same as table text color */
+}
+
+.modal-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.modal-content th,
+.modal-content td {
   padding: 14px;
   border: 1px solid #ddd;
   text-align: center;
@@ -108,22 +46,28 @@ th, td {
   word-wrap: break-word;
 }
 
-th {
+.modal-content th {
   background-color: #691636;
   color: white;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-td {
+.modal-content td {
   background-color: #f9f9f9;
 }
 
-/* Alternating row colors */
-tr:nth-child(even) {
-  background-color: #f4f4f4;
+/* Close button */
+.close {
+  color: #691636;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
 }
 
-tr:hover {
-  background-color: #ddd;
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
 }
