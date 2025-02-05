@@ -12,7 +12,8 @@
     <h1>Doctor, Department, or Specialty Search</h1>
   </header>
 
-  <div class="search-container">
+  <!-- Search Section with Background Same as Website -->
+  <div class="search-container" style="background-image: url('https://github.com/ykhafaja/my-html-site/blob/main/Background.jpg?raw=true'); background-size: cover; background-position: center;">
     <label for="search">Search for a Doctor, Department, or Specialty:</label>
     <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
     <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
@@ -36,16 +37,7 @@
     <div class="popup-content">
       <span class="close" onclick="closePopup()">&times;</span>
       <h2>Search Results</h2>
-      <table id="popupTable">
-        <thead>
-          <tr>
-            <th>Floor</th>
-            <th>Dept-Name</th>
-            <th>Specialty</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <div id="popupSections"></div> <!-- New Div for Grouping Data -->
     </div>
   </div>
 
@@ -90,33 +82,58 @@
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
       var rows = document.querySelectorAll("#doctorTable tbody tr");
-      var results = [];
-      
+      var groupedResults = {};
+
       rows.forEach(function(row) {
         var text = row.innerText.toLowerCase();
+        var floor = row.querySelector("td").innerText; // Get the floor (section) from the first column
         if (text.includes(input)) {
-          row.style.display = "";
-          results.push(row);
-        } else {
-          row.style.display = "none";
+          if (!groupedResults[floor]) {
+            groupedResults[floor] = [];
+          }
+          groupedResults[floor].push(row);
         }
       });
 
-      if (results.length > 0) {
-        openPopup(results);
+      if (Object.keys(groupedResults).length > 0) {
+        openPopup(groupedResults);
       }
     }
 
-    function openPopup(rows) {
+    function openPopup(groupedResults) {
       var popup = document.getElementById("popup");
-      var popupTableBody = document.querySelector("#popupTable tbody");
-      popupTableBody.innerHTML = ""; // Clear previous popup data
+      var popupSections = document.getElementById("popupSections");
+      popupSections.innerHTML = ""; // Clear previous popup data
 
-      rows.forEach(function(row) {
-        var tr = document.createElement("tr");
-        tr.innerHTML = row.innerHTML; // Copy row content from the table
-        popupTableBody.appendChild(tr);
-      });
+      for (var floor in groupedResults) {
+        var sectionDiv = document.createElement("div");
+        sectionDiv.classList.add("popup-section");
+        var sectionTitle = document.createElement("h3");
+        sectionTitle.innerText = `Floor ${floor}`;
+        sectionDiv.appendChild(sectionTitle);
+
+        var table = document.createElement("table");
+        var tableHead = document.createElement("thead");
+        tableHead.innerHTML = `
+          <tr>
+            <th>Floor</th>
+            <th>Dept-Name</th>
+            <th>Specialty</th>
+          </tr>
+        `;
+        table.appendChild(tableHead);
+
+        var tableBody = document.createElement("tbody");
+        groupedResults[floor].forEach(function(row) {
+          var tr = document.createElement("tr");
+          tr.innerHTML = row.innerHTML; // Copy row content from the table
+          tableBody.appendChild(tr);
+        });
+
+        table.appendChild(tableBody);
+        sectionDiv.appendChild(table);
+        popupSections.appendChild(sectionDiv);
+      }
 
       popup.style.display = "flex"; // Show the popup
     }
