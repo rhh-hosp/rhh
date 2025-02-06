@@ -13,8 +13,17 @@
   </header>
 
   <div class="search-container">
-    <label for="search">Search for a Doctor, Department, or Specialty:</label>
-    <label for="search" class="arabic-label">ابحث عن طبيب أو اسم قسم أو تخصص:</label>
+    <label for="departmentFilter">Select Department - اختار القسم:</label>
+    <select id="departmentFilter" onchange="filterByDepartment()">
+      <option value="">All</option>
+    </select>
+    
+    <label for="doctorFilter">Select Doctor:</label>
+    <select id="doctorFilter">
+      <option value="">All</option>
+    </select>
+    
+    <label for="search">Search for a Department:</label>
     <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
   </div>
 
@@ -41,12 +50,49 @@
       dynamicTyping: true,
       complete: function(results) {
         allData = results.data;
+        populateDepartmentDropdown();
         showData(allData);
       },
       error: function(error) {
         console.error("Error loading CSV:", error);
       }
     });
+
+    function populateDepartmentDropdown() {
+      var departmentSet = new Set();
+      allData.forEach(row => {
+        if (row["Department"]) departmentSet.add(row["Department"]);
+      });
+      
+      var departmentFilter = document.getElementById("departmentFilter");
+      departmentSet.forEach(department => {
+        var option = document.createElement("option");
+        option.value = department;
+        option.textContent = department;
+        departmentFilter.appendChild(option);
+      });
+    }
+
+    function filterByDepartment() {
+      var selectedDepartment = document.getElementById("departmentFilter").value;
+      var doctorFilter = document.getElementById("doctorFilter");
+      doctorFilter.innerHTML = '<option value="">All</option>';
+      
+      var filteredDoctors = allData.filter(row => row["Department"] === selectedDepartment);
+      var doctorSet = new Set();
+      filteredDoctors.forEach(row => {
+        if (row["DeptName"]) doctorSet.add(row["DeptName"]);
+      });
+      
+      doctorSet.forEach(doctor => {
+        var option = document.createElement("option");
+        option.value = doctor;
+        option.textContent = doctor;
+        doctorFilter.appendChild(option);
+      });
+      
+      showData(filteredDoctors.length ? filteredDoctors : allData);
+    }
 
     function showData(data) {
       var tbody = document.querySelector("#doctorTable tbody");
@@ -69,18 +115,13 @@
           var tr = document.createElement("tr");
           var deptName = row["DeptName"] || "";
           var specialty = row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : "";
-
-          var deptNameForDisplay = deptName.replace(/"([^"]+)"/g, '').trim();
-          var specialtyForDisplay = specialty.replace(/"([^"]+)"/g, '').trim();
-
           tr.innerHTML = `
             <td>${floor}</td>
-            <td>${deptNameForDisplay}</td>
-            <td>${specialtyForDisplay}</td>
+            <td>${deptName}</td>
+            <td>${specialty}</td>
           `;
           tr.dataset.deptName = deptName.toLowerCase();
-          tr.dataset.specialty = specialty.toLowerCase();
-
+          tr.dataset.department = row["Department"].toLowerCase();
           tbody.appendChild(tr);
         });
       }
@@ -88,21 +129,12 @@
 
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
-      var tbody = document.querySelector("#doctorTable tbody");
-      tbody.innerHTML = '';
-      if (input.trim() === "") {
-        showData(allData);
-        return;
-      }
       var filteredData = allData.filter(row => {
         var deptName = row["DeptName"] ? row["DeptName"].toLowerCase() : "";
-        var specialty = row["Specialty"] ? row["Specialty"].toLowerCase() : "";
-        return (deptName + " " + specialty).includes(input);
+        var department = row["Department"] ? row["Department"].toLowerCase() : "";
+        return deptName.includes(input) || department.includes(input);
       });
       showData(filteredData);
-      if (filteredData.length > 0) {
-        document.querySelector("#doctorTable").scrollIntoView({ behavior: "smooth" });
-      }
     }
   </script>
 </body>
