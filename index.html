@@ -18,53 +18,16 @@
       background-color: #f9f9f9;
       color: #691636;
       font-weight: bold;
-      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    select:hover {
-      background-color: #f1e3dd;
     }
     select:focus {
       outline: none;
       border-color: #74613C;
     }
-    
-    .selected-filters {
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      color: #691636;
-      margin-top: 10px;
-    }
-    
-    #search {
-      width: 75%;
-      padding: 10px;
-      border: 2px solid #691636;
-      border-radius: 4px;
-      font-size: 16px;
-    }
-    #clearSearch {
-      background-color: #691636;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-left: 10px;
-      border-radius: 4px;
-    }
-    #clearSearch:hover {
-      background-color: #74613C;
-    }
-    
-    tr.highlight {
-      background-color: #ffeb99 !important;
-    }
   </style>
 </head>
 <body>
   <header class="header">
-    <h1>Doctor Search</h1>
+    <h1></h1>
   </header>
 
   <div class="search-container">
@@ -80,11 +43,6 @@
     
     <label for="search">Search for a Department:</label>
     <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
-    <button id="clearSearch" onclick="clearSearch()">Clear</button>
-  </div>
-  
-  <div class="selected-filters">
-    Selected Department: <span id="selectedDept">All</span> | Selected Doctor: <span id="selectedDoc">All</span>
   </div>
 
   <div class="table-container">
@@ -104,26 +62,56 @@
     var allData = [];
     var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
 
-    function loadCSV() {
-      Papa.parse(csvUrl, {
-        download: true,
-        header: true,
-        dynamicTyping: true,
-        complete: function(results) {
-          allData = results.data.filter(row => row["Dept-Name"] && row["Floor"] && row["Department"]);
-          populateDepartmentDropdown();
-          showData(allData);
-        },
-        error: function(error) {
-          console.error("Error loading CSV:", error);
+    Papa.parse(csvUrl, {
+      download: true,
+      header: true,
+      dynamicTyping: true,
+      complete: function(results) {
+        allData = results.data;
+        populateDepartmentDropdown();
+        showData(allData);
+      },
+      error: function(error) {
+        console.error("Error loading CSV:", error);
+      }
+    });
+
+    function showData(data) {
+      var tbody = document.querySelector("#doctorTable tbody");
+      tbody.innerHTML = "";
+      var groupedData = {};
+      data.forEach(function(row) {
+        var floor = row["Floor"] || "Unknown";
+        if (!groupedData[floor]) {
+          groupedData[floor] = [];
         }
+        groupedData[floor].push(row);
       });
+
+      for (var floor in groupedData) {
+        var sectionHeader = document.createElement("tr");
+        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
+        tbody.appendChild(sectionHeader);
+
+        groupedData[floor].forEach(function(row) {
+          var tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row["Floor"] || "Unknown"}</td>
+            <td>${row["DeptName"] || ""}</td>
+            <td>${row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : ""}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
     }
 
     function populateDepartmentDropdown() {
-      var departmentSet = new Set(allData.map(row => row["Department"]).filter(Boolean));
+      var departmentSet = new Set();
+      allData.forEach(row => {
+        if (row["Department"]) departmentSet.add(row["Department"]);
+      });
+      
       var departmentFilter = document.getElementById("departmentFilter");
-      departmentFilter.innerHTML = '<option value="">All</option>';
       departmentSet.forEach(department => {
         var option = document.createElement("option");
         option.value = department;
@@ -134,14 +122,17 @@
 
     function filterByDepartment() {
       var selectedDepartment = document.getElementById("departmentFilter").value;
-      document.getElementById("selectedDept").textContent = selectedDepartment || "All";
-      var filteredData = allData.filter(row => !selectedDepartment || row["Department"] === selectedDepartment);
-      populateDoctorDropdown(filteredData);
+      var filteredData = allData.filter(row => selectedDepartment === "" || row["Department"] === selectedDepartment);
       showData(filteredData);
+      populateDoctorDropdown(filteredData);
     }
 
-    function populateDoctorDropdown(filteredData) {
-      var doctorSet = new Set(filteredData.map(row => row["Dept-Name"]).filter(Boolean));
+    function populateDoctorDropdown(data) {
+      var doctorSet = new Set();
+      data.forEach(row => {
+        if (row["DeptName"]) doctorSet.add(row["DeptName"]);
+      });
+      
       var doctorFilter = document.getElementById("doctorFilter");
       doctorFilter.innerHTML = '<option value="">All</option>';
       doctorSet.forEach(doctor => {
@@ -152,28 +143,21 @@
       });
     }
 
-    function searchTable() {
-      var input = document.getElementById("search").value.toLowerCase();
-      var filteredData = allData.filter(row => row["Dept-Name"].toLowerCase().includes(input) || row["Department"].toLowerCase().includes(input));
+    function filterByDoctor() {
+      var selectedDoctor = document.getElementById("doctorFilter").value;
+      var filteredData = allData.filter(row => selectedDoctor === "" || row["DeptName"] === selectedDoctor);
       showData(filteredData);
     }
 
-    function clearSearch() {
-      document.getElementById("search").value = "";
-      showData(allData);
-    }
-
-    function showData(data) {
-      var tbody = document.querySelector("#doctorTable tbody");
-      tbody.innerHTML = "";
-      data.forEach(row => {
-        var tr = document.createElement("tr");
-        tr.innerHTML = `<td>${row["Floor"]}</td><td>${row["Dept-Name"]}</td><td>${row["Specialty"]}</td>`;
-        tbody.appendChild(tr);
+    function searchTable() {
+      var input = document.getElementById("search").value.toLowerCase();
+      var filteredData = allData.filter(row => {
+        var deptName = row["DeptName"] ? row["DeptName"].toLowerCase() : "";
+        var department = row["Department"] ? row["Department"].toLowerCase() : "";
+        return deptName.includes(input) || department.includes(input);
       });
+      showData(filteredData);
     }
-
-    window.onload = loadCSV;
   </script>
 </body>
 </html>
