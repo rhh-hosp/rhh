@@ -10,18 +10,18 @@ body {
   overflow-x: hidden;
 }
 
-/* Header Section */
+/* Header Section - Reduced Banner Height */
 .header {
   background-image: url('https://github.com/ykhafaja/my-html-site/blob/main/About_banner-about.jpg?raw=true');
   background-size: cover;
   background-position: center;
-  height: 250px;
+  height: 150px; /* Reduced from 250px */
   display: flex;
   justify-content: center;
   align-items: center;
   color: white;
   text-align: center;
-  font-size: 2rem;
+  font-size: 1.5rem; /* Adjusted text size */
   font-weight: bold;
   padding: 0 20px;
   width: 100%;
@@ -30,7 +30,7 @@ body {
 
 /* Search Section */
 .search-container {
-  margin: 20px 0;
+  margin: 10px 0; /* Reduced margin to bring results closer */
   text-align: center;
   width: 100%;
 }
@@ -50,24 +50,27 @@ body {
 input[type="text"] {
   width: 80%;
   padding: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 10px; /* Reduced margin to make results visible */
   font-size: 16px;
   border: 1px solid #691636;
   border-radius: 4px;
   box-sizing: border-box;
 }
 
-/* Table Wrapper */
+/* Table Wrapper - Ensuring Results Stay Visible */
 .table-container {
+  max-height: 400px; /* Ensures results fit in view */
+  overflow-y: auto; /* Scrolls only inside the table */
   width: 100%;
-  overflow-x: auto;
-  display: block;
+  border: 2px solid #691636;
+  margin-top: 10px; /* Reduced margin to bring table up */
 }
 
+/* Table Styling */
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin-top: 10px; /* Reduced margin */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -93,7 +96,7 @@ td {
   background-color: #f9f9f9;
 }
 
-/* Alternating row colors */
+/* Alternating Row Colors */
 tr:nth-child(even) {
   background-color: #f4f4f4;
 }
