@@ -146,16 +146,17 @@
     }
 
     function searchTable() {
-      var input = document.getElementById("search").value.toLowerCase();
-      var filteredData = allData.filter(row => {
-        var deptName = row["DeptName"] ? row["DeptName"].replace(/".*?"/g, "").trim().toLowerCase() : "";
-        var department = row["Department"] ? row["Department"].toLowerCase() : "";
-        
-        return deptName.includes(input) || department.includes(input);
-      });
+  var input = document.getElementById("search").value.toLowerCase();
+  var filteredData = allData.filter(row => {
+    var deptNameRaw = row["DeptName"] ? row["DeptName"].toLowerCase() : "";
+    var deptNameClean = deptNameRaw.replace(/".*?"/g, "").trim(); // Remove from display but keep raw data
+    var department = row["Department"] ? row["Department"].toLowerCase() : "";
+    
+    return deptNameRaw.includes(input) || department.includes(input);
+  });
 
-      showData(filteredData);
-    }
+  showData(filteredData);
+}
   </script>
 </body>
 </html>
