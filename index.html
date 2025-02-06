@@ -76,6 +76,35 @@
       }
     });
 
+    function showData(data) {
+      var tbody = document.querySelector("#doctorTable tbody");
+      tbody.innerHTML = "";
+      var groupedData = {};
+      data.forEach(function(row) {
+        var floor = row["Floor"] || "Unknown";
+        if (!groupedData[floor]) {
+          groupedData[floor] = [];
+        }
+        groupedData[floor].push(row);
+      });
+
+      for (var floor in groupedData) {
+        var sectionHeader = document.createElement("tr");
+        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
+        tbody.appendChild(sectionHeader);
+
+        groupedData[floor].forEach(function(row) {
+          var tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row["Floor"] || "Unknown"}</td>
+            <td>${row["DeptName"] || ""}</td>
+            <td>${row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : ""}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
     function populateDepartmentDropdown() {
       var departmentSet = new Set();
       allData.forEach(row => {
@@ -118,20 +147,6 @@
       var selectedDoctor = document.getElementById("doctorFilter").value;
       var filteredData = allData.filter(row => selectedDoctor === "" || row["DeptName"] === selectedDoctor);
       showData(filteredData);
-    }
-
-    function showData(data) {
-      var tbody = document.querySelector("#doctorTable tbody");
-      tbody.innerHTML = "";
-      data.forEach(function(row) {
-        var tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row["Floor"] || "Unknown"}</td>
-          <td>${row["DeptName"] || ""}</td>
-          <td>${row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : ""}</td>
-        `;
-        tbody.appendChild(tr);
-      });
     }
 
     function searchTable() {
