@@ -41,7 +41,7 @@
       <option value="">All</option>
     </select>
     
-    <label for="search">Search for for a doctor ,Department أبحث باسم الدكتور أو القسم :</label>
+    <label for="search">Search for a doctor, Department أبحث باسم الدكتور أو القسم:</label>
     <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
   </div>
 
@@ -76,36 +76,40 @@
         console.error("Error loading CSV:", error);
       }
     });
-function showData(data) {
-  var tbody = document.querySelector("#doctorTable tbody");
-  tbody.innerHTML = "";
-  var groupedData = {};
-  data.forEach(function(row) {
-    var floor = row["Floor"] || "Unknown";
-    if (!groupedData[floor]) {
-      groupedData[floor] = [];
+
+    function showData(data) {
+      var tbody = document.querySelector("#doctorTable tbody");
+      tbody.innerHTML = "";
+      var groupedData = {};
+
+      data.forEach(function(row) {
+        var floor = row["Floor"] || "Unknown";
+        var deptName = row["DeptName"] ? row["DeptName"].replace(/".*?"/g, "").trim() : "";
+
+        if (!deptName) return; // Skip empty deptNames
+
+        if (!groupedData[floor]) {
+          groupedData[floor] = [];
+        }
+        groupedData[floor].push({ ...row, DeptName: deptName });
+      });
+
+      for (var floor in groupedData) {
+        var sectionHeader = document.createElement("tr");
+        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
+        tbody.appendChild(sectionHeader);
+
+        groupedData[floor].forEach(function(row) {
+          var tr = document.createElement("tr");
+          tr.innerHTML = ` 
+            <td>${row["Floor"] || "Unknown"}</td>
+            <td>${row["DeptName"]}</td>
+            <td>${row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : ""}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
     }
-    groupedData[floor].push(row);
-  });
-
-  for (var floor in groupedData) {
-    var sectionHeader = document.createElement("tr");
-    sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
-    tbody.appendChild(sectionHeader);
-
-    groupedData[floor].forEach(function(row) {
-      var deptNameDisplay = row["DeptName"] ? row["DeptName"].replace(/".*?"/g, "") : "";
-      var tr = document.createElement("tr");
-      tr.innerHTML = ` 
-        <td>${row["Floor"] || "Unknown"}</td>
-        <td>${deptNameDisplay}</td>
-        <td>${row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : ""}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-}
-
 
     function populateDepartmentDropdown() {
       var departmentSet = new Set(allData.map(row => row["Department"]).filter(Boolean));
@@ -114,9 +118,15 @@ function showData(data) {
     }
 
     function populateDoctorDropdown(data) {
-      var doctorSet = new Set(data.map(row => row["DeptName"]).filter(Boolean));
+      var doctorSet = new Set(
+        data
+          .map(row => row["DeptName"] ? row["DeptName"].replace(/".*?"/g, "").trim() : "")
+          .filter(Boolean) // Remove empty names
+      );
+
       var doctorFilter = document.getElementById("doctorFilter");
-      doctorFilter.innerHTML = '<option value="">All</option>' + [...doctorSet].map(doc => `<option value="${doc}">${doc}</option>`).join('');
+      doctorFilter.innerHTML = '<option value="">All</option>' + [...doctorSet]
+        .map(doc => `<option value="${doc}">${doc}</option>`).join('');
     }
 
     function filterByDepartment() {
@@ -128,17 +138,22 @@ function showData(data) {
 
     function filterByDoctor() {
       var selectedDoctor = document.getElementById("doctorFilter").value;
-      var filteredData = allData.filter(row => !selectedDoctor || row["DeptName"] === selectedDoctor);
+      var filteredData = allData.filter(row => {
+        var deptName = row["DeptName"] ? row["DeptName"].replace(/".*?"/g, "").trim() : "";
+        return !selectedDoctor || deptName === selectedDoctor;
+      });
       showData(filteredData);
     }
 
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
       var filteredData = allData.filter(row => {
-        var deptName = row["DeptName"] ? row["DeptName"].toLowerCase() : "";
+        var deptName = row["DeptName"] ? row["DeptName"].replace(/".*?"/g, "").trim().toLowerCase() : "";
         var department = row["Department"] ? row["Department"].toLowerCase() : "";
+        
         return deptName.includes(input) || department.includes(input);
       });
+
       showData(filteredData);
     }
   </script>
