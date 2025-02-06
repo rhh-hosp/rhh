@@ -94,59 +94,18 @@
         tbody.appendChild(sectionHeader);
 
         groupedData[floor].forEach(function(row) {
+          var deptName = row["DeptName"] || "";
+          var hiddenDeptName = deptName.replace(/".*?"/g, ""); // Remove words in quotes
+
           var tr = document.createElement("tr");
           tr.innerHTML = `
             <td>${row["Floor"] || "Unknown"}</td>
-            <td>${row["DeptName"] || ""}</td>
+            <td>${hiddenDeptName}</td>
             <td>${row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : ""}</td>
           `;
           tbody.appendChild(tr);
         });
       }
-    }
-
-    function populateDepartmentDropdown() {
-      var departmentSet = new Set();
-      allData.forEach(row => {
-        if (row["Department"]) departmentSet.add(row["Department"]);
-      });
-      
-      var departmentFilter = document.getElementById("departmentFilter");
-      departmentSet.forEach(department => {
-        var option = document.createElement("option");
-        option.value = department;
-        option.textContent = department;
-        departmentFilter.appendChild(option);
-      });
-    }
-
-    function filterByDepartment() {
-      var selectedDepartment = document.getElementById("departmentFilter").value;
-      var filteredData = allData.filter(row => selectedDepartment === "" || row["Department"] === selectedDepartment);
-      showData(filteredData);
-      populateDoctorDropdown(filteredData);
-    }
-
-    function populateDoctorDropdown(data) {
-      var doctorSet = new Set();
-      data.forEach(row => {
-        if (row["DeptName"]) doctorSet.add(row["DeptName"]);
-      });
-      
-      var doctorFilter = document.getElementById("doctorFilter");
-      doctorFilter.innerHTML = '<option value="">All</option>';
-      doctorSet.forEach(doctor => {
-        var option = document.createElement("option");
-        option.value = doctor;
-        option.textContent = doctor;
-        doctorFilter.appendChild(option);
-      });
-    }
-
-    function filterByDoctor() {
-      var selectedDoctor = document.getElementById("doctorFilter").value;
-      var filteredData = allData.filter(row => selectedDoctor === "" || row["DeptName"] === selectedDoctor);
-      showData(filteredData);
     }
 
     function searchTable() {
