@@ -76,39 +76,36 @@
         console.error("Error loading CSV:", error);
       }
     });
-
-    function showData(data) {
-      var tbody = document.querySelector("#doctorTable tbody");
-      tbody.innerHTML = "";
-      var groupedData = {};
-      data.forEach(function(row) {
-        var floor = row["Floor"] || "Unknown";
-        if (!groupedData[floor]) {
-          groupedData[floor] = [];
-        }
-        groupedData[floor].push(row);
-      });
-
-      for (var floor in groupedData) {
-        var sectionHeader = document.createElement("tr");
-        sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
-        tbody.appendChild(sectionHeader);
-
-        groupedData[floor].forEach(function(row) {
-          var deptNameDisplay = row["DeptName"] ? row["DeptName"].replace(/".*?"/g, "") : "";
-          var tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${row["Floor"] || "Unknown"}</td>
-            <td>${deptNameDisplay}</td>
-            <td>${row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : ""}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      }
-      if (tbody.children.length > 0) {
-        tbody.children[0].scrollIntoView({ behavior: 'smooth' });
-      }
+function showData(data) {
+  var tbody = document.querySelector("#doctorTable tbody");
+  tbody.innerHTML = "";
+  var groupedData = {};
+  data.forEach(function(row) {
+    var floor = row["Floor"] || "Unknown";
+    if (!groupedData[floor]) {
+      groupedData[floor] = [];
     }
+    groupedData[floor].push(row);
+  });
+
+  for (var floor in groupedData) {
+    var sectionHeader = document.createElement("tr");
+    sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
+    tbody.appendChild(sectionHeader);
+
+    groupedData[floor].forEach(function(row) {
+      var deptNameDisplay = row["DeptName"] ? row["DeptName"].replace(/".*?"/g, "") : "";
+      var tr = document.createElement("tr");
+      tr.innerHTML = ` 
+        <td>${row["Floor"] || "Unknown"}</td>
+        <td>${deptNameDisplay}</td>
+        <td>${row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : ""}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+}
+
 
     function populateDepartmentDropdown() {
       var departmentSet = new Set(allData.map(row => row["Department"]).filter(Boolean));
