@@ -10,18 +10,18 @@ body {
   overflow-x: hidden;
 }
 
-/* Header Section - Reduced Banner Height */
+/* Header Section - Further Reduced Height */
 .header {
   background-image: url('https://github.com/ykhafaja/my-html-site/blob/main/About_banner-about.jpg?raw=true');
   background-size: cover;
   background-position: center;
-  height: 150px; /* Reduced from 250px */
+  height: 120px; /* Reduced from 150px */
   display: flex;
   justify-content: center;
   align-items: center;
   color: white;
   text-align: center;
-  font-size: 1.5rem; /* Adjusted text size */
+  font-size: 1.3rem; /* Adjusted text size */
   font-weight: bold;
   padding: 0 20px;
   width: 100%;
