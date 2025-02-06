@@ -105,31 +105,9 @@
           tbody.appendChild(tr);
         });
       }
-    }
-
-    function populateDepartmentDropdown() {
-      var departmentSet = new Set(allData.map(row => row["Department"]).filter(Boolean));
-      var departmentFilter = document.getElementById("departmentFilter");
-      departmentFilter.innerHTML = '<option value="">All</option>' + [...departmentSet].map(dept => `<option value="${dept}">${dept}</option>`).join('');
-    }
-
-    function populateDoctorDropdown(data) {
-      var doctorSet = new Set(data.map(row => row["DeptName"]).filter(Boolean));
-      var doctorFilter = document.getElementById("doctorFilter");
-      doctorFilter.innerHTML = '<option value="">All</option>' + [...doctorSet].map(doc => `<option value="${doc}">${doc}</option>`).join('');
-    }
-
-    function filterByDepartment() {
-      var selectedDepartment = document.getElementById("departmentFilter").value;
-      var filteredData = allData.filter(row => !selectedDepartment || row["Department"] === selectedDepartment);
-      populateDoctorDropdown(filteredData);
-      showData(filteredData);
-    }
-
-    function filterByDoctor() {
-      var selectedDoctor = document.getElementById("doctorFilter").value;
-      var filteredData = allData.filter(row => !selectedDoctor || row["DeptName"] === selectedDoctor);
-      showData(filteredData);
+      if (tbody.children.length > 0) {
+        tbody.children[0].scrollIntoView({ behavior: 'smooth' });
+      }
     }
 
     function searchTable() {
