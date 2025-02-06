@@ -64,22 +64,22 @@
 </head>
 <body>
   <header class="header">
-    <h1></h1>
+    <h1>Doctor Search</h1>
   </header>
 
   <div class="search-container">
     <label for="departmentFilter">Select Department - اختار القسم:</label>
-    <select id="departmentFilter" onchange="filterByDepartment()">
+    <select id="departmentFilter" onchange="filterData()">
       <option value="">All</option>
     </select>
     
     <label for="doctorFilter">Select Doctor:</label>
-    <select id="doctorFilter" onchange="filterByDoctor()">
+    <select id="doctorFilter" onchange="filterData()">
       <option value="">All</option>
     </select>
     
     <label for="search">Search for a Department:</label>
-    <input type="text" id="search" placeholder="Search..." onkeyup="searchTable()">
+    <input type="text" id="search" placeholder="Search..." onkeyup="filterData()">
     <button id="clearSearch" onclick="clearSearch()">Clear</button>
   </div>
   
@@ -102,6 +102,7 @@
 
   <script>
     var allData = [];
+    var filteredData = [];
     var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
 
     Papa.parse(csvUrl, {
@@ -110,8 +111,10 @@
       dynamicTyping: true,
       complete: function(results) {
         allData = results.data.filter(row => row["DeptName"] && row["Floor"] && row["Department"]);
+        filteredData = allData;  // Initial filtered data
         populateDepartmentDropdown();
-        showData(allData);
+        populateDoctorDropdown(filteredData);
+        showData(filteredData);
       },
       error: function(error) {
         console.error("Error loading CSV:", error);
@@ -129,14 +132,6 @@
       });
     }
 
-    function filterByDepartment() {
-      var selectedDepartment = document.getElementById("departmentFilter").value;
-      document.getElementById("selectedDept").textContent = selectedDepartment || "All";
-      var filteredData = allData.filter(row => !selectedDepartment || row["Department"] === selectedDepartment);
-      populateDoctorDropdown(filteredData);
-      showData(filteredData);
-    }
-
     function populateDoctorDropdown(filteredData) {
       var doctorSet = new Set(filteredData.map(row => row["DeptName"]).filter(Boolean));
       var doctorFilter = document.getElementById("doctorFilter");
@@ -149,22 +144,38 @@
       });
     }
 
-    function filterByDoctor() {
+    function filterData() {
+      var selectedDepartment = document.getElementById("departmentFilter").value;
       var selectedDoctor = document.getElementById("doctorFilter").value;
+      var searchTerm = document.getElementById("search").value.toLowerCase();
+
+      document.getElementById("selectedDept").textContent = selectedDepartment || "All";
       document.getElementById("selectedDoc").textContent = selectedDoctor || "All";
-      var filteredData = allData.filter(row => !selectedDoctor || row["DeptName"] === selectedDoctor);
+
+      filteredData = allData.filter(function(row) {
+        var matchesDepartment = !selectedDepartment || row["Department"] === selectedDepartment;
+        var matchesDoctor = !selectedDoctor || row["DeptName"] === selectedDoctor;
+        var matchesSearch = row["DeptName"].toLowerCase().includes(searchTerm) || row["Department"].toLowerCase().includes(searchTerm);
+        return matchesDepartment && matchesDoctor && matchesSearch;
+      });
+
       showData(filteredData);
     }
 
-    function searchTable() {
-      var input = document.getElementById("search").value.toLowerCase();
-      var filteredData = allData.filter(row => row["DeptName"].toLowerCase().includes(input) || row["Department"].toLowerCase().includes(input));
-      showData(filteredData);
+    function showData(data) {
+      var tableBody = document.querySelector("#doctorTable tbody");
+      tableBody.innerHTML = "";
+      
+      data.forEach(function(row) {
+        var tr = document.createElement("tr");
+        tr.innerHTML = `<td>${row["Floor"]}</td><td>${row["DeptName"]}</td><td>${row["Specialty"]}</td>`;
+        tableBody.appendChild(tr);
+      });
     }
 
     function clearSearch() {
       document.getElementById("search").value = "";
-      showData(allData);
+      filterData(); // Reapply filters
     }
   </script>
 </body>
