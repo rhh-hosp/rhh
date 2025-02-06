@@ -64,7 +64,7 @@
 </head>
 <body>
   <header class="header">
-    <h1></h1>
+    <h1>Doctor Search</h1>
   </header>
 
   <div class="search-container">
@@ -104,23 +104,26 @@
     var allData = [];
     var csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vThqvDdT8gY65dr-DbNdiE8SMGPaWkrTEr7ZG-UMfl3XDRfIlMZmIwymtF84TwP0Glr17X74xrXHiwX/pub?gid=0&single=true&output=csv';
 
-    Papa.parse(csvUrl, {
-      download: true,
-      header: true,
-      dynamicTyping: true,
-      complete: function(results) {
-        allData = results.data.filter(row => row["Dept-Name"] && row["Floor"] && row["Department"]);
-        populateDepartmentDropdown();
-        showData(allData);
-      },
-      error: function(error) {
-        console.error("Error loading CSV:", error);
-      }
-    });
+    function loadCSV() {
+      Papa.parse(csvUrl, {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        complete: function(results) {
+          allData = results.data.filter(row => row["Dept-Name"] && row["Floor"] && row["Department"]);
+          populateDepartmentDropdown();
+          showData(allData);
+        },
+        error: function(error) {
+          console.error("Error loading CSV:", error);
+        }
+      });
+    }
 
     function populateDepartmentDropdown() {
       var departmentSet = new Set(allData.map(row => row["Department"]).filter(Boolean));
       var departmentFilter = document.getElementById("departmentFilter");
+      departmentFilter.innerHTML = '<option value="">All</option>';
       departmentSet.forEach(department => {
         var option = document.createElement("option");
         option.value = department;
@@ -149,13 +152,6 @@
       });
     }
 
-    function filterByDoctor() {
-      var selectedDoctor = document.getElementById("doctorFilter").value;
-      document.getElementById("selectedDoc").textContent = selectedDoctor || "All";
-      var filteredData = allData.filter(row => !selectedDoctor || row["Dept-Name"] === selectedDoctor);
-      showData(filteredData);
-    }
-
     function searchTable() {
       var input = document.getElementById("search").value.toLowerCase();
       var filteredData = allData.filter(row => row["Dept-Name"].toLowerCase().includes(input) || row["Department"].toLowerCase().includes(input));
@@ -176,6 +172,8 @@
         tbody.appendChild(tr);
       });
     }
+
+    window.onload = loadCSV;
   </script>
 </body>
 </html>
