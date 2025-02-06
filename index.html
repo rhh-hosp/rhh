@@ -1,64 +1,66 @@
-function cleanText(text) {
-  return text.replace(/"[^"]*"/g, "").trim();
-}
+<script>
+  function cleanText(text) {
+    return text.replace(/"[^"]*"/g, "").trim();
+  }
 
-function showData(data) {
-  var tbody = document.querySelector("#doctorTable tbody");
-  tbody.innerHTML = "";
-  var groupedData = {};
-  data.forEach(function(row) {
-    var floor = row["Floor"] || "Unknown";
-    if (!groupedData[floor]) {
-      groupedData[floor] = [];
+  function showData(data) {
+    var tbody = document.querySelector("#doctorTable tbody");
+    tbody.innerHTML = "";
+    var groupedData = {};
+    data.forEach(function(row) {
+      var floor = row["Floor"] || "Unknown";
+      if (!groupedData[floor]) {
+        groupedData[floor] = [];
+      }
+      groupedData[floor].push(row);
+    });
+
+    for (var floor in groupedData) {
+      var sectionHeader = document.createElement("tr");
+      sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
+      tbody.appendChild(sectionHeader);
+
+      groupedData[floor].forEach(function(row) {
+        var tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row["Floor"] || "Unknown"}</td>
+          <td>${cleanText(row["DeptName"] || "")}</td>
+          <td>${row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : ""}</td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
-    groupedData[floor].push(row);
-  });
+  }
 
-  for (var floor in groupedData) {
-    var sectionHeader = document.createElement("tr");
-    sectionHeader.innerHTML = `<td colspan="3" style="font-weight: bold; background-color: #74613C; color: white; text-align: center;">${floor}</td>`;
-    tbody.appendChild(sectionHeader);
-
-    groupedData[floor].forEach(function(row) {
-      var tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${row["Floor"] || "Unknown"}</td>
-        <td>${cleanText(row["DeptName"] || "")}</td>
-        <td>${row["Specialty"] ? row["Specialty"].replace(/\n/g, "<br>") : ""}</td>
-      `;
-      tbody.appendChild(tr);
+  function populateDepartmentDropdown() {
+    var departmentSet = new Set();
+    allData.forEach(row => {
+      if (row["Department"]) departmentSet.add(cleanText(row["Department"]));
+    });
+    
+    var departmentFilter = document.getElementById("departmentFilter");
+    departmentFilter.innerHTML = '<option value="">All</option>';
+    departmentSet.forEach(department => {
+      var option = document.createElement("option");
+      option.value = department;
+      option.textContent = department;
+      departmentFilter.appendChild(option);
     });
   }
-}
 
-function populateDepartmentDropdown() {
-  var departmentSet = new Set();
-  allData.forEach(row => {
-    if (row["Department"]) departmentSet.add(cleanText(row["Department"]));
-  });
-  
-  var departmentFilter = document.getElementById("departmentFilter");
-  departmentFilter.innerHTML = '<option value="">All</option>';
-  departmentSet.forEach(department => {
-    var option = document.createElement("option");
-    option.value = department;
-    option.textContent = department;
-    departmentFilter.appendChild(option);
-  });
-}
-
-function populateDoctorDropdown(data) {
-  var doctorSet = new Set();
-  data.forEach(row => {
-    if (row["DeptName"]) doctorSet.add(cleanText(row["DeptName"]));
-  });
-  
-  var doctorFilter = document.getElementById("doctorFilter");
-  doctorFilter.innerHTML = '<option value="">All</option>';
-  doctorSet.forEach(doctor => {
-    var option = document.createElement("option");
-    option.value = doctor;
-    option.textContent = doctor;
-    doctorFilter.appendChild(option);
-  });
-}
+  function populateDoctorDropdown(data) {
+    var doctorSet = new Set();
+    data.forEach(row => {
+      if (row["DeptName"]) doctorSet.add(cleanText(row["DeptName"]));
+    });
+    
+    var doctorFilter = document.getElementById("doctorFilter");
+    doctorFilter.innerHTML = '<option value="">All</option>';
+    doctorSet.forEach(doctor => {
+      var option = document.createElement("option");
+      option.value = doctor;
+      option.textContent = doctor;
+      doctorFilter.appendChild(option);
+    });
+  }
+</script>
